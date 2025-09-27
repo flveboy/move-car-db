@@ -60,35 +60,31 @@ const nextConfig: NextConfig = {
 //   },
 // };
 
-  // webpack 优化 - 关键修改！
-  webpack: (config, { dev, isServer, buildId }) => {
-    // 生产环境优化
+  module.exports = {
+  webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
-      // 禁用源映射
       config.devtool = false;
       
-      // 优化 chunk 分割
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // 将 react 相关包单独打包
-            react: {
-              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-              name: 'react',
-              chunks: 'all',
-              priority: 20,
-            },
-            // 将其他 node_modules 单独打包
-            lib: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
+      // 更细致的代码分割配置
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        minSize: 20000, // 减小最小 chunk 大小
+        maxSize: 24414016, // 限制 chunk 大小为 ~23.3MiB (略小于25MiB)
+        minRemainingSize: 0,
+        minChunks: 1,
+        maxAsyncRequests: 30,
+        maxInitialRequests: 30,
+        enforceSizeThreshold: 50000,
+        cacheGroups: {
+          defaultVendors: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
           },
         },
       };
