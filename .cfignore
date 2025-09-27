@@ -1,0 +1,6 @@
+.next/cache/
+.next/static/chunks/*.map
+.next/static/css/*.map
+.next/server/**/*.map
+*.log
+.DS_Store
