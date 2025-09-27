@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Owner {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  name      String
+  email     String?
+  password  String   // 密码哈希
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+
+  vehicles  Vehicle[]
+  codes     Code[]
+  records   Record[]
+
+  @@map("owners")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Vehicle {
+  id           String   @id @default(cuid())
+  ownerId      String
+  licensePlate String   @unique
+  brand        String?
+  model        String?
+  color        String?
+  // 钉钉通知配置
+  dingtalkWebhook String?
+  dingtalkSign    Boolean  @default(false)
+  dingtalkKeyword String?
+  dingtalkSecret  String?
+  // 企微通知配置
+  wechatWebhook   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  owner        Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  codes        Code[]
+}
+
+model Code {
+  id        String   @id @default(cuid())
+  vehicleId String
+  ownerId   String
+  code      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiredAt DateTime?
+
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  owner     Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  records   Record[]
+}
+
+model Record {
+  id         String   @id @default(cuid())
+  codeId     String
+  ownerId    String   // 添加所有者关联
+  scanTime   DateTime @default(now())
+  ipAddress  String?
+  userAgent  String?
+  location   String?
+  message    String?
+  createdAt  DateTime @default(now())
+
+  code       Code     @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  owner      Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("records")
+}
