@@ -60,7 +60,6 @@ const nextConfig: NextConfig = {
 //   },
 // };
 
-  module.exports = {
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
       config.devtool = false;
