@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 // 登录验证 schema
 const loginSchema = z.object({
-  phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
+  username: z.string().min(1, '请输入用户名'),
   password: z.string().min(1, '请输入密码')
 })
 
@@ -18,13 +18,13 @@ export async function POST(request: NextRequest) {
     
     // 查找用户
     const user = await db.owner.findUnique({
-      where: { phone: validatedData.phone }
+      where: { username: validatedData.username }
     })
     
     if (!user) {
       return NextResponse.json(
-        { error: '手机号或密码错误' },
-        { status: 401 }
+        { error: '系统中不存在此用户', userExists: false },
+        { status: 200 }
       )
     }
     
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await verifyPassword(validatedData.password, user.password)
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: '手机号或密码错误' },
+        { error: '用户名或密码错误' },
         { status: 401 }
       )
     }

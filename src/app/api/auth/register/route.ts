@@ -5,10 +5,15 @@ import { z } from 'zod'
 
 // 注册验证 schema
 const registerSchema = z.object({
+  username: z.string().min(3, '用户名至少3个字符').max(20, '用户名最多20个字符'),
   phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
   name: z.string().min(2, '姓名至少2个字符'),
   email: z.string().email('请输入有效的邮箱地址').optional().or(z.literal('')),
-  password: z.string().min(6, '密码至少6个字符')
+  password: z.string().min(6, '密码至少6个字符'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: '两次输入的密码不一致',
+  path: ['confirmPassword']
 })
 
 export async function POST(request: NextRequest) {
@@ -18,12 +23,23 @@ export async function POST(request: NextRequest) {
     // 验证输入
     const validatedData = registerSchema.parse(body)
     
-    // 检查手机号是否已存在
-    const existingUser = await db.owner.findUnique({
+    // 检查用户名和手机号是否已存在
+    const existingUserByUsername = await db.owner.findUnique({
+      where: { username: validatedData.username }
+    })
+    
+    if (existingUserByUsername) {
+      return NextResponse.json(
+        { error: '该用户名已被使用' },
+        { status: 400 }
+      )
+    }
+    
+    const existingUserByPhone = await db.owner.findUnique({
       where: { phone: validatedData.phone }
     })
     
-    if (existingUser) {
+    if (existingUserByPhone) {
       return NextResponse.json(
         { error: '该手机号已注册' },
         { status: 400 }
@@ -36,6 +52,7 @@ export async function POST(request: NextRequest) {
     // 创建用户
     const user = await db.owner.create({
       data: {
+        username: validatedData.username,
         phone: validatedData.phone,
         name: validatedData.name,
         email: validatedData.email || null,

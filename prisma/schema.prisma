@@ -9,14 +9,15 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model Owner {
   id        String   @id @default(cuid())
+  username  String   @unique  // 新增用户名字段，唯一
   phone     String   @unique
-  name      String
+  name      String   // 姓名
   email     String?
   password  String   // 密码哈希
   role      Role     @default(USER)
@@ -56,12 +57,33 @@ model Vehicle {
 
   owner        Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   codes        Code[]
+  drivers      Driver[]
+}
+
+model Driver {
+  id           String   @id @default(cuid())
+  vehicleId    String
+  name         String
+  phone        String
+  // 钉钉通知配置
+  dingtalkWebhook String?
+  dingtalkSign    Boolean  @default(false)
+  dingtalkKeyword String?
+  dingtalkSecret  String?
+  // 企微通知配置
+  wechatWebhook   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  vehicle      Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  codes        Code[]   @relation("DriverCodes")
 }
 
 model Code {
   id        String   @id @default(cuid())
   vehicleId String
   ownerId   String
+  driverId  String?
   code      String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -70,6 +92,7 @@ model Code {
 
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   owner     Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  driver    Driver?  @relation("DriverCodes", fields: [driverId], references: [id], onDelete: Cascade)
   records   Record[]
 }
 

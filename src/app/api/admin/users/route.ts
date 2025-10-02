@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 // 用户创建验证 schema
 const createUserSchema = z.object({
+  username: z.string().min(3, '用户名至少3个字符').max(20, '用户名最多20个字符'),
   phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
   name: z.string().min(2, '姓名至少2个字符'),
   email: z.string().email('请输入有效的邮箱地址').optional().or(z.literal('')),
@@ -132,8 +133,21 @@ export async function POST(request: NextRequest) {
     const initialPassword = validatedData.phone.slice(-6)
     const hashedPassword = await hashPassword(initialPassword)
     
+    // 检查用户名是否已存在
+    const existingUserByUsername = await db.owner.findUnique({
+      where: { username: validatedData.username }
+    })
+    
+    if (existingUserByUsername) {
+      return NextResponse.json(
+        { error: '该用户名已被使用' },
+        { status: 400 }
+      )
+    }
+
     const user = await db.owner.create({
       data: {
+        username: validatedData.username,
         phone: validatedData.phone,
         name: validatedData.name,
         email: validatedData.email || null,

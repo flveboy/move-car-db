@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +21,10 @@ interface Vehicle {
     name?: string
     phone?: string
   }
+  driver?: {
+    name?: string
+    phone?: string
+  }
 }
 
 interface CodeInfo {
@@ -30,10 +34,8 @@ interface CodeInfo {
   isActive: boolean
 }
 
-function ScanResultContent() {
+function ScanResultContent({ code }: { code: string }) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const code = searchParams.get('code')
   
   const [codeInfo, setCodeInfo] = useState<CodeInfo | null>(null)
   const [loading, setLoading] = useState(true)
@@ -173,8 +175,9 @@ function ScanResultContent() {
   }
 
   const handlePhoneCall = () => {
-    if (codeInfo?.vehicle.owner?.phone) {
-      window.open(`tel:${codeInfo.vehicle.owner.phone}`, '_self')
+    const phone = codeInfo?.vehicle.driver?.phone || codeInfo?.vehicle.owner?.phone
+    if (phone) {
+      window.open(`tel:${phone}`, '_self')
     }
   }
 
@@ -351,14 +354,16 @@ function ScanResultContent() {
                 </div>
 
                 {/* 拨打电话按钮 */}
-                {codeInfo.vehicle.owner?.phone && (
+                {(codeInfo.vehicle.driver?.phone || codeInfo.vehicle.owner?.phone) && (
                   <Button
                     onClick={handlePhoneCall}
                     variant="outline"
                     className="w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     <Phone className="h-4 w-4 mr-2" />
-                    直接拨打电话 ({codeInfo.vehicle.owner.phone})
+                    直接拨打电话 (
+                    {codeInfo.vehicle.driver?.phone || codeInfo.vehicle.owner?.phone}
+                    )
                   </Button>
                 )}
 
@@ -385,14 +390,14 @@ function ScanResultContent() {
   )
 }
 
-export default function ScanResultPage() {
+export default function ScanResultPage({ params }: { params: { code: string } }) {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     }>
-      <ScanResultContent />
+      <ScanResultContent code={params.code} />
     </Suspense>
   )
 }

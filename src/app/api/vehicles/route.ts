@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, withDatabaseRetry } from '@/lib/db'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { z } from 'zod'
 
@@ -134,38 +134,40 @@ export async function GET(request: NextRequest) {
     const isAdmin = currentUser.role === 'ADMIN'
     const where = isAdmin ? {} : { ownerId: currentUser.id }
     
-    // 获取车辆列表
-    const [vehicles, total] = await Promise.all([
-      db.vehicle.findMany({
-        where,
-        skip: offset,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          owner: {
-            select: {
-              id: true,
-              name: true,
-              phone: true,
+    // 使用重试机制获取车辆列表
+    const [vehicles, total] = await withDatabaseRetry(async () => {
+      return Promise.all([
+        db.vehicle.findMany({
+          where,
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            owner: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+              },
             },
-          },
-          codes: {
-            include: {
-              records: {
-                orderBy: { createdAt: 'desc' },
-                take: 3,
+            codes: {
+              include: {
+                records: {
+                  orderBy: { createdAt: 'desc' },
+                  take: 3,
+                },
+              },
+            },
+            _count: {
+              select: {
+                codes: true,
               },
             },
           },
-          _count: {
-            select: {
-              codes: true,
-            },
-          },
-        },
-      }),
-      db.vehicle.count({ where }),
-    ])
+        }),
+        db.vehicle.count({ where })
+      ]);
+    });
     
     return NextResponse.json({
       success: true,

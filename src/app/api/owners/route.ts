@@ -6,6 +6,7 @@ import { hashPassword } from '@/lib/auth'
 
 // 创建车主的验证模式
 const createOwnerSchema = z.object({
+  username: z.string().min(3, '用户名至少3个字符').max(20, '用户名最多20个字符'),
   phone: z.string().min(1, '手机号不能为空'),
   name: z.string().min(1, '姓名不能为空'),
   email: z.string().email('邮箱格式不正确').optional().nullable(),
@@ -36,9 +37,22 @@ export async function POST(request: NextRequest) {
     const defaultPassword = '123456' // 默认密码，实际应用中应该让用户设置
     const hashedPassword = await hashPassword(defaultPassword)
     
+    // 检查用户名是否已存在
+    const existingUsername = await db.owner.findUnique({
+      where: { username: validatedData.username }
+    })
+    
+    if (existingUsername) {
+      return NextResponse.json(
+        { error: '该用户名已被使用' },
+        { status: 400 }
+      )
+    }
+
     const owner = await OwnerCache.create(async () => {
       return await db.owner.create({
         data: {
+          username: validatedData.username,
           phone: validatedData.phone,
           name: validatedData.name,
           email: validatedData.email,

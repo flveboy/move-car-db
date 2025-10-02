@@ -54,40 +54,97 @@ export async function POST(request: NextRequest) {
       }, { status: 429 })
     }
 
-    // 获取车辆信息
-    const vehicle = await db.vehicle.findUnique({
+    // 获取车辆信息和关联的挪车码
+    const vehicleWithCode = await db.vehicle.findUnique({
       where: { id: vehicleId },
       include: {
         owner: {
           select: {
-            name: true
+            id: true,
+            name: true,
+            phone: true
+          }
+        },
+        codes: {
+          where: { code },
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                dingtalkWebhook: true,
+                dingtalkSign: true,
+                dingtalkKeyword: true,
+                dingtalkSecret: true
+              }
+            }
           }
         }
       }
     })
 
-    if (!vehicle) {
+    if (!vehicleWithCode) {
       return NextResponse.json(
         { error: '车辆不存在' },
         { status: 404 }
       )
     }
 
-    // 检查是否配置了钉钉webhook
-    if (!vehicle.dingtalkWebhook) {
+    // 检查是否有关联的挪车码
+    if (!vehicleWithCode.codes || vehicleWithCode.codes.length === 0) {
       return NextResponse.json(
-        { error: '车主未配置钉钉通知' },
+        { error: '挪车码不存在' },
+        { status: 404 }
+      )
+    }
+
+    const codeRecord = vehicleWithCode.codes[0]
+    
+    // 确定使用车主还是代开驾驶员的配置
+    const contact = codeRecord.driver || vehicleWithCode.owner
+    
+    // 优先使用代开驾驶员的配置，如果未配置则使用车主的配置
+    const driverHasDingtalkConfig = codeRecord.driver && (
+      codeRecord.driver.dingtalkWebhook || 
+      codeRecord.driver.dingtalkSign || 
+      codeRecord.driver.dingtalkKeyword || 
+      codeRecord.driver.dingtalkSecret
+    )
+    
+    const dingtalkWebhook = driverHasDingtalkConfig 
+      ? codeRecord.driver?.dingtalkWebhook 
+      : vehicleWithCode.dingtalkWebhook
+      
+    const dingtalkSign = driverHasDingtalkConfig 
+      ? codeRecord.driver?.dingtalkSign 
+      : vehicleWithCode.dingtalkSign
+      
+    const dingtalkKeyword = driverHasDingtalkConfig 
+      ? codeRecord.driver?.dingtalkKeyword 
+      : vehicleWithCode.dingtalkKeyword
+      
+    const dingtalkSecret = driverHasDingtalkConfig 
+      ? codeRecord.driver?.dingtalkSecret 
+      : vehicleWithCode.dingtalkSecret
+
+    // 检查是否配置了钉钉webhook
+    if (!dingtalkWebhook) {
+      return NextResponse.json(
+        { error: '未配置钉钉通知' },
         { status: 400 }
       )
     }
 
     // 构建消息内容
-    const ownerName = vehicle.owner?.name || '车主'
+    const contactName = contact?.name || '车主'
+    const contactPhone = contact?.phone || '未知号码'
+    const licensePlate = vehicleWithCode.licensePlate
     const now = new Date()
     // 转换为中国时区 (UTC+8)
     const chinaTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000))
     const notificationTime = `${chinaTime.getFullYear()}-${String(chinaTime.getMonth() + 1).padStart(2, '0')}-${String(chinaTime.getDate()).padStart(2, '0')} ${String(chinaTime.getHours()).padStart(2, '0')}:${String(chinaTime.getMinutes()).padStart(2, '0')}:${String(chinaTime.getSeconds()).padStart(2, '0')}`
-    const messageContent = `【挪车通知】\n\n尊敬的${ownerName}，您的车辆 ${vehicle.licensePlate} 需要移车。\n\n通知内容：${message}\n\n通知时间：${notificationTime}\n\n请尽快处理，谢谢！`
+    const messageContent = `【挪车通知】\n\n尊敬的${contactName}，您的车辆 ${licensePlate} 需要移车。\n\n通知内容：${message}\n\n通知时间：${notificationTime}\n\n联系电话：${contactPhone}\n\n请尽快处理，谢谢！`
 
     const payload = {
       msgtype: 'text',
@@ -97,10 +154,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 如果启用了加签，需要添加签名
-    let url = vehicle.dingtalkWebhook
-    if (vehicle.dingtalkSign && vehicle.dingtalkSecret) {
+    let url = dingtalkWebhook
+    if (dingtalkSign && dingtalkSecret) {
       const timestamp = Date.now()
-      const sign = await generateDingTalkSign(timestamp, vehicle.dingtalkSecret)
+      const sign = await generateDingTalkSign(timestamp, dingtalkSecret)
       url += `&timestamp=${timestamp}&sign=${sign}`
     }
 
@@ -124,12 +181,11 @@ export async function POST(request: NextRequest) {
       
       if (result.errcode === 0) {
         // 记录成功的通知
-        const codeRecord = await db.code.findFirst({ where: { code } })
         if (codeRecord) {
           await db.record.create({
             data: {
               codeId: codeRecord.id,
-              ownerId: vehicle.ownerId,
+              ownerId: vehicleWithCode.ownerId,
               ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
               userAgent: request.headers.get('user-agent') || 'unknown',
               message: `钉钉通知: ${message}`

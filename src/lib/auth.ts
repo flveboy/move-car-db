@@ -13,10 +13,12 @@ export interface JWTPayload {
 
 export interface AuthUser {
   id: string
+  username: string
   phone: string
   name: string
   email?: string
   role: string
+  createdAt?: string
 }
 
 // 密码哈希
@@ -74,9 +76,10 @@ export function isAdmin(userRole: string): boolean {
 }
 
 // 格式化用户信息（返回给前端的用户对象）
-export function formatAuthUser(user: Owner): AuthUser {
+export function formatAuthUser(user: any): AuthUser {
   return {
     id: user.id,
+    username: user.username || '', // 临时解决方案，确保username有值
     phone: user.phone,
     name: user.name,
     email: user.email || undefined,

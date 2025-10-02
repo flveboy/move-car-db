@@ -143,7 +143,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 检查车辆是否存在，并包含关联的挪车码信息
+    // 检查车辆是否存在，并包含关联的所有信息
     const existingVehicle = await db.vehicle.findUnique({
       where: { id: (await params).id },
       include: {
@@ -156,9 +156,11 @@ export async function DELETE(
             },
           },
         },
+        drivers: true, // 包含代开驾驶员信息
         _count: {
           select: {
             codes: true,
+            drivers: true,
           },
         },
       },
@@ -171,34 +173,44 @@ export async function DELETE(
       )
     }
     
-    // 如果车辆有关联的挪车码，先删除所有挪车码及其相关记录
-    if ((existingVehicle._count?.codes || 0) > 0) {
-      // 删除所有挪车码的扫描记录
-      await db.record.deleteMany({
-        where: {
-          codeId: {
-            in: existingVehicle.codes.map(code => code.id),
+    // 使用事务确保数据一致性，按正确顺序删除所有相关数据
+    await db.$transaction(async (tx) => {
+      // 1. 删除所有挪车码的扫描记录
+      if (existingVehicle.codes.length > 0) {
+        await tx.record.deleteMany({
+          where: {
+            codeId: {
+              in: existingVehicle.codes.map(code => code.id),
+            },
           },
-        },
-      })
+        })
+      }
       
-      // 删除所有挪车码
-      await db.code.deleteMany({
+      // 2. 删除所有挪车码（包括车主和代开驾驶员的）
+      await tx.code.deleteMany({
         where: {
           vehicleId: (await params).id,
         },
       })
-    }
-    
-    // 删除车辆
-    await db.vehicle.delete({
-      where: { id: (await params).id },
+      
+      // 3. 删除所有代开驾驶员
+      await tx.driver.deleteMany({
+        where: {
+          vehicleId: (await params).id,
+        },
+      })
+      
+      // 4. 最后删除车辆
+      await tx.vehicle.delete({
+        where: { id: (await params).id },
+      })
     })
     
     return NextResponse.json({
       success: true,
-      message: '车辆及其关联的挪车码已成功删除',
+      message: '车辆及其关联的挪车码、代开驾驶员已成功删除',
       deletedCodesCount: existingVehicle._count?.codes || 0,
+      deletedDriversCount: existingVehicle._count?.drivers || 0,
     })
   } catch (error) {
     console.error('删除车辆失败:', error)

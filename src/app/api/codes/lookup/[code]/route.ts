@@ -15,22 +15,55 @@ export async function GET(
       )
     }
 
-    // 查找挪车码
+    // 1. 先查找code记录获取关联ID
     const codeRecord = await db.code.findUnique({
       where: { code: code },
-      include: {
-        vehicle: {
-          include: {
-            owner: {
-              select: {
-                phone: true,
-                name: true
-              }
+      select: {
+        id: true,
+        code: true,
+        isActive: true,
+        expiredAt: true,
+        ownerId: true,
+        driverId: true,
+        vehicleId: true
+      }
+    })
+
+    if (!codeRecord) {
+      return NextResponse.json(
+        { error: '挪车码不存在' },
+        { status: 404 }
+      )
+    }
+
+    // 2. 并行获取车辆和驾驶员信息
+    const [vehicle, driver] = await Promise.all([
+      db.vehicle.findUnique({
+        where: { id: codeRecord.vehicleId },
+        include: {
+          owner: {
+            select: {
+              phone: true,
+              name: true
             }
           }
         }
-      }
-    })
+      }),
+      codeRecord.driverId ? db.driver.findUnique({
+        where: { id: codeRecord.driverId },
+        select: {
+          phone: true,
+          name: true
+        }
+      }) : Promise.resolve(null)
+    ])
+
+    if (!vehicle) {
+      return NextResponse.json(
+        { error: '关联车辆不存在' },
+        { status: 404 }
+      )
+    }
 
     if (!codeRecord) {
       return NextResponse.json(
@@ -65,20 +98,30 @@ export async function GET(
       }
     })
 
-    // 返回车辆信息
-    const vehicleInfo = {
-      id: codeRecord.vehicle.id,
-      licensePlate: codeRecord.vehicle.licensePlate,
-      brand: codeRecord.vehicle.brand,
-      model: codeRecord.vehicle.model,
-      color: codeRecord.vehicle.color,
-      ownerPhone: codeRecord.vehicle.owner.phone,
-      ownerName: codeRecord.vehicle.owner.name
-    }
-
+    // 返回完整挪车码信息
     return NextResponse.json({
       success: true,
-      data: vehicleInfo
+      data: {
+        id: codeRecord.id,
+        code: codeRecord.code,
+        isActive: codeRecord.isActive,
+        expiredAt: codeRecord.expiredAt,
+        vehicle: {
+          id: vehicle.id,
+          licensePlate: vehicle.licensePlate,
+          brand: vehicle.brand,
+          model: vehicle.model,
+          color: vehicle.color,
+          owner: {
+            phone: vehicle.owner.phone,
+            name: vehicle.owner.name
+          }
+        },
+        driver: driver ? {
+          phone: driver.phone,
+          name: driver.name
+        } : null
+      }
     })
 
   } catch (error) {

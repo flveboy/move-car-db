@@ -16,8 +16,21 @@ import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
 import { Header } from '@/components/layout/header'
-import { Car, QrCode, History, Plus, Trash2, Power, Download, Share2, Loader2, Edit } from 'lucide-react'
+import { Car, QrCode, History, Plus, Trash2, Power, Download, Share2, Loader2, Edit, Users, Save } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+
+interface Driver {
+  id: string
+  name: string
+  phone: string
+  vehicleId: string
+  createdAt: string
+  dingtalkWebhook?: string
+  dingtalkSign?: boolean
+  dingtalkSecret?: string
+  dingtalkKeyword?: string
+  wechatWebhook?: string
+}
 
 interface Vehicle {
   id: string
@@ -25,6 +38,7 @@ interface Vehicle {
   brand?: string
   model?: string
   color?: string
+    drivers: number
   // 钉钉通知配置
   dingtalkWebhook?: string
   dingtalkSign: boolean
@@ -35,6 +49,7 @@ interface Vehicle {
   createdAt: string
   _count: {
     codes: number
+    drivers: number
   }
 }
 
@@ -45,6 +60,7 @@ interface Code {
   isActive: boolean
   createdAt: string
   expiredAt?: string
+  driverId?: string
   vehicle: {
     licensePlate: string
     brand?: string
@@ -75,6 +91,20 @@ export default function Home() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [codes, setCodes] = useState<Code[]>([])
   const [records, setRecords] = useState<Record[]>([])
+  const [drivers, setDrivers] = useState<Driver[]>([])
+  const [isDriverDialogOpen, setIsDriverDialogOpen] = useState(false)
+  const [isEditDriverDialogOpen, setIsEditDriverDialogOpen] = useState(false)
+  const [currentVehicleId, setCurrentVehicleId] = useState<string>('')
+  const [driverForm, setDriverForm] = useState({
+    name: '',
+    phone: '',
+    dingtalkWebhook: '',
+    dingtalkSign: false,
+    dingtalkSecret: '',
+    dingtalkKeyword: '',
+    wechatWebhook: ''
+  })
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   // 搜索状态
@@ -98,8 +128,14 @@ export default function Home() {
 
   // 车辆编辑表单状态
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  
+  // 驾驶员管理状态
+
+  
+
 
   // 编辑车辆表单状态
   const [editForm, setEditForm] = useState({
@@ -116,8 +152,7 @@ export default function Home() {
     wechatWebhook: ''
   })
 
-  // 删除确认状态
-  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null)
+
   const [codeToDelete, setCodeToDelete] = useState<Code | null>(null)
 
   // 挪车码元素引用，用于滚动定位
@@ -125,6 +160,9 @@ export default function Home() {
   
   // 当前需要高亮显示的挪车码ID
   const [highlightedCodeId, setHighlightedCodeId] = useState<string | null>(null)
+  
+  // 挪车码tab状态
+  const [codesTab, setCodesTab] = useState('owner')
 
   // 通知测试状态
   const [dingtalkTestForm, setDingtalkTestForm] = useState({
@@ -435,12 +473,13 @@ export default function Home() {
     
     try {
       // 检查该车辆是否已经有挪车码
-      const existingCodes = codes.filter(code => code.vehicleId === vehicleId)
+      const existingCodes = codes.filter(code => code.vehicleId === vehicleId && !code.driverId)
       
       if (existingCodes.length > 0) {
         // 如果已经有挪车码，切换到挪车码tab并定位到第一个挪车码
         const firstCode = existingCodes[0]
         setActiveTab('codes')
+        setCodesTab('owner') // 切换到我的挪车码tab
         setHighlightedCodeId(firstCode.id)
         
         // 清空搜索框以确保挪车码可见
@@ -466,6 +505,7 @@ export default function Home() {
           
           // 切换到挪车码tab并定位到新生成的挪车码
           setActiveTab('codes')
+          setCodesTab('owner') // 切换到我的挪车码tab
           setHighlightedCodeId(newCode.id)
           
           // 清空搜索框以确保挪车码可见
@@ -517,7 +557,7 @@ export default function Home() {
       
       // Generate QR code as data URL with full URL
       const canvas = document.createElement('canvas')
-      const qrContent = `${window.location.origin}/scan?code=${code}`
+      const qrContent = `${window.location.origin}/scan/${code}`
       await QRCode.toCanvas(canvas, qrContent, {
         width: 400,
         margin: 2,
@@ -596,6 +636,289 @@ export default function Home() {
       setIsLoading(false)
     }
   }
+
+  // 添加驾驶员函数
+  const handleAddDriver = async () => {
+    if (!driverForm.name.trim() || !driverForm.phone.trim()) {
+      alert('请填写驾驶员姓名和手机号')
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(driverForm)
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // 刷新驾驶员列表
+        await fetchDrivers()
+        // 清空表单
+        setDriverForm({ 
+          name: '', 
+          phone: '', 
+          licenseNumber: '',
+          dingtalkWebhook: '',
+          dingtalkSign: false,
+          dingtalkSecret: '',
+          dingtalkKeyword: '',
+          wechatWebhook: ''
+        })
+        alert('驾驶员添加成功')
+      } else {
+        alert(`添加驾驶员失败：${result.error || '未知错误'}`)
+      }
+    } catch (error) {
+      console.error('添加驾驶员失败:', error)
+      alert('添加驾驶员失败，请检查网络连接')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 编辑驾驶员函数
+  const handleEditDriver = (driver: Driver) => {
+    setEditingDriver(driver)
+    setDriverForm({
+      name: driver.name,
+      phone: driver.phone,
+      dingtalkWebhook: driver.dingtalkWebhook || '',
+      dingtalkSign: driver.dingtalkSign || false,
+      dingtalkSecret: driver.dingtalkSecret || '',
+      dingtalkKeyword: driver.dingtalkKeyword || '',
+      wechatWebhook: driver.wechatWebhook || ''
+    })
+    setIsEditDriverDialogOpen(true)
+  }
+
+  // 更新驾驶员函数
+  const handleUpdateDriver = async () => {
+    if (!editingDriver || !currentVehicleId) return
+    
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers/${editingDriver.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(driverForm)
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // 刷新驾驶员列表
+        await fetchDrivers()
+        setIsEditDriverDialogOpen(false)
+        setEditingDriver(null)
+        setDriverForm({ 
+          name: '', 
+          phone: '', 
+          licenseNumber: '',
+          dingtalkWebhook: '',
+          dingtalkSign: false,
+          dingtalkSecret: '',
+          dingtalkKeyword: '',
+          wechatWebhook: ''
+        })
+        alert('驾驶员信息更新成功')
+      } else {
+        alert(`更新驾驶员信息失败：${result.error || '未知错误'}`)
+      }
+    } catch (error) {
+      console.error('更新驾驶员信息失败:', error)
+      alert('更新驾驶员信息失败，请检查网络连接')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 生成驾驶员挪车码函数
+  const handleGenerateDriverCode = async (driver: Driver) => {
+    setIsLoading(true)
+    
+    try {
+      // 首先检查驾驶员是否已有挪车码
+      const checkResponse = await fetch(`/api/codes?driverId=${driver.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (checkResponse.ok) {
+        const checkResult = await checkResponse.json()
+        const existingCode = checkResult.data?.find((code: any) => code.driverId === driver.id)
+        
+        if (existingCode) {
+          // 如果已有挪车码，跳转到挪车码管理页面并高亮对应记录
+          setActiveTab('codes')
+          setCodesTab('driver') // 切换到代开驾驶员挪车码tab
+          setHighlightedCodeId(existingCode.id)
+          setIsDriverDialogOpen(false)
+          // 清空搜索框以确保挪车码可见
+          setSearchTerm('')
+          //alert(`驾驶员 "${driver.name}" 已有挪车码，已跳转到挪车码管理页面`)
+          return
+        }
+      }
+
+      // 如果没有挪车码，则生成新的挪车码
+      const response = await fetch('/api/codes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          vehicleId: currentVehicleId,
+          driverId: driver.id
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // 刷新挪车码列表
+        await fetchCodes()
+        setActiveTab('codes')
+        setCodesTab('driver') // 切换到代开驾驶员挪车码tab
+        setHighlightedCodeId(result.data.id)
+        setIsDriverDialogOpen(false)
+        // 清空搜索框以确保挪车码可见
+        setSearchTerm('')
+        alert('挪车码生成成功')
+      } else {
+        alert(`生成挪车码失败：${result.error || '未知错误'}`)
+      }
+    } catch (error) {
+      console.error('生成挪车码失败:', error)
+      alert('生成挪车码失败，请检查网络连接')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 切换驾驶员状态函数
+  const handleToggleDriver = async (driverId: string, isActive: boolean) => {
+    if (!currentVehicleId) return
+    
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers/${driverId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isActive })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // 刷新驾驶员列表
+        await fetchDrivers()
+        alert(`驾驶员已${isActive ? '启用' : '停用'}`)
+      } else {
+        alert(`切换驾驶员状态失败：${result.error || '未知错误'}`)
+      }
+    } catch (error) {
+      console.error('切换驾驶员状态失败:', error)
+      alert('切换驾驶员状态失败，请检查网络连接')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 删除驾驶员函数
+  const handleDeleteDriver = async (driverId: string) => {
+    if (!confirm('确定要删除这个驾驶员吗？此操作不可撤销。')) {
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers/${driverId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // 刷新驾驶员列表
+        await fetchDrivers()
+        alert('驾驶员删除成功')
+      } else {
+        alert(`删除驾驶员失败：${result.error || '未知错误'}`)
+      }
+    } catch (error) {
+      console.error('删除驾驶员失败:', error)
+      alert('删除驾驶员失败，请检查网络连接')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 获取挪车码列表函数
+  const fetchCodes = async () => {
+    try {
+      const response = await fetch('/api/codes', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        setCodes(result.data || [])
+      }
+    } catch (error) {
+      console.error('获取挪车码列表失败:', error)
+    }
+  }
+
+  // 获取驾驶员列表函数
+  const fetchDrivers = async () => {
+    if (!currentVehicleId) return
+    
+    try {
+      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        setDrivers(result.data || [])
+      }
+    } catch (error) {
+      console.error('获取驾驶员列表失败:', error)
+    }
+  }
+
+  // 监听对话框打开状态变化，自动获取驾驶员数据
+  useEffect(() => {
+    if (isDriverDialogOpen && currentVehicleId) {
+      fetchDrivers()
+    }
+  }, [isDriverDialogOpen, currentVehicleId])
 
   // 企微通知测试函数
   const handleTestWechatNotification = async () => {
@@ -1080,6 +1403,20 @@ export default function Home() {
                                 >
                                   <Edit className="h-4 w-4" />
                                 </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => { 
+                                    setCurrentVehicleId(vehicle.id); 
+                                    setIsDriverDialogOpen(true);
+                                    // 打开对话框后立即获取驾驶员数据
+                                    setTimeout(() => fetchDrivers(), 100);
+                                  }}
+                                  disabled={isLoading}
+                                  title="管理代开驾驶员"
+                                >
+                                  <Users className="h-4 w-4" />
+                                </Button>
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
                                     <Button
@@ -1152,10 +1489,10 @@ export default function Home() {
                         <div>
                           <CardTitle className="text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
                             <QrCode className="h-5 w-5" />
-                            我的挪车码
+                            挪车码管理
                           </CardTitle>
                           <CardDescription className="text-gray-600">
-                            管理您的挪车码，可生成、停用、启用挪车码
+                            管理您的挪车码，支持车主挪车码和代开驾驶员挪车码分类管理
                           </CardDescription>
                         </div>
                         <div className="relative w-full sm:w-64">
@@ -1182,97 +1519,203 @@ export default function Home() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {filteredCodes.length === 0 ? (
-                        <div className="text-center py-8">
-                          <QrCode className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-500">
-                            {searchTerm ? '没有找到匹配的挪车码' : '暂无挪车码，请先添加车辆并生成挪车码'}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {filteredCodes.map((code) => (
-                            <div 
-                              key={code.id} 
-                              ref={(el) => { codeRefs.current[code.id] = el }}
-                              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg transition-all duration-300"
-                            >
-                              <div>
-                                <div className="font-medium text-gray-900">{code.code}</div>
-                                <div className="text-sm text-gray-500">
-                                  {code.vehicle.licensePlate} {code.vehicle.brand}
-                                </div>
-                                <div className="text-xs text-gray-400">
-                                  创建时间: {new Date(code.createdAt).toLocaleDateString()}
-                                </div>
-                                <div className="text-xs text-gray-400">
-                                  扫描次数: {code._count?.records || 0}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2">
-                                  <Switch
-                                    checked={code.isActive}
-                                    onCheckedChange={() => handleToggleCode(code.id)}
-                                    disabled={isLoading}
-                                    className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
-                                  />
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleDownloadQRCode(code.code, code.vehicle.licensePlate)}
-                                  disabled={isLoading}
+                      <Tabs value={codesTab} onValueChange={setCodesTab} className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 mb-4">
+                          <TabsTrigger value="owner">我的挪车码</TabsTrigger>
+                          <TabsTrigger value="driver">代开驾驶员挪车码</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="owner" className="space-y-4">
+                          {filteredCodes.filter(code => !code.driverId).length === 0 ? (
+                            <div className="text-center py-8">
+                              <QrCode className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                              <p className="text-gray-500">
+                                {searchTerm ? '没有找到匹配的车主挪车码' : '暂无车主挪车码，请先为车辆生成挪车码'}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {filteredCodes.filter(code => !code.driverId).map((code) => (
+                                <div 
+                                  key={code.id} 
+                                  ref={(el) => { codeRefs.current[code.id] = el }}
+                                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg transition-all duration-300"
                                 >
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
+                                  <div>
+                                    <div className="font-medium text-gray-900">{code.code}</div>
+                                    <div className="text-sm text-gray-500">
+                                      {code.vehicle.licensePlate} {code.vehicle.brand}
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                      创建时间: {new Date(code.createdAt).toLocaleDateString()}
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                      扫描次数: {code._count?.records || 0}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2">
+                                      <Switch
+                                        checked={code.isActive}
+                                        onCheckedChange={() => handleToggleCode(code.id)}
+                                        disabled={isLoading}
+                                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
+                                      />
+                                    </div>
                                     <Button
                                       size="sm"
-                                      variant="destructive"
+                                      variant="outline"
+                                      onClick={() => handleDownloadQRCode(code.code, code.vehicle.licensePlate)}
                                       disabled={isLoading}
-                                      onClick={() => setCodeToDelete(code)}
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Download className="h-4 w-4" />
                                     </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>确认删除挪车码</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        您确定要删除挪车码 "{codeToDelete?.code}" 吗？
-                                        {codeToDelete && codeToDelete._count?.records && codeToDelete._count.records > 0 && (
-                                          <div className="mt-2 text-red-600">
-                                            注意：该挪车码还有 {codeToDelete._count.records} 条扫描记录，删除后无法恢复。
-                                          </div>
-                                        )}
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>取消</AlertDialogCancel>
-                                      <AlertDialogAction 
-                                        onClick={handleDeleteCode}
-                                        className="bg-red-600 hover:bg-red-700"
-                                        disabled={isLoading}
-                                      >
-                                        {isLoading ? (
-                                          <div className="flex items-center justify-center">
-                                            <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                                            删除中...
-                                          </div>
-                                        ) : (
-                                          '删除'
-                                        )}
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          size="sm"
+                                          variant="destructive"
+                                          disabled={isLoading}
+                                          onClick={() => setCodeToDelete(code)}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>确认删除挪车码</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            您确定要删除挪车码 "{codeToDelete?.code}" 吗？
+                                            {codeToDelete && codeToDelete._count?.records && codeToDelete._count.records > 0 && (
+                                              <div className="mt-2 text-red-600">
+                                                注意：该挪车码还有 {codeToDelete._count.records} 条扫描记录，删除后无法恢复。
+                                              </div>
+                                            )}
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>取消</AlertDialogCancel>
+                                          <AlertDialogAction 
+                                            onClick={handleDeleteCode}
+                                            className="bg-red-600 hover:bg-red-700"
+                                            disabled={isLoading}
+                                          >
+                                            {isLoading ? (
+                                              <div className="flex items-center justify-center">
+                                                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                                删除中...
+                                              </div>
+                                            ) : (
+                                              '删除'
+                                            )}
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                          )}
+                        </TabsContent>
+                        
+                        <TabsContent value="driver" className="space-y-4">
+                          {filteredCodes.filter(code => code.driverId).length === 0 ? (
+                            <div className="text-center py-8">
+                              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                              <p className="text-gray-500">
+                                {searchTerm ? '没有找到匹配的代开驾驶员挪车码' : '暂无代开驾驶员挪车码，请先为代开驾驶员生成挪车码'}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {filteredCodes.filter(code => code.driverId).map((code) => (
+                                <div 
+                                  key={code.id} 
+                                  ref={(el) => { codeRefs.current[code.id] = el }}
+                                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg transition-all duration-300"
+                                >
+                                  <div>
+                                    <div className="font-medium text-gray-900">{code.code}</div>
+                                    <div className="text-sm text-gray-500">
+                                      {code.vehicle.licensePlate} {code.vehicle.brand}
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                      驾驶员: {drivers.find(d => d.id === code.driverId)?.name || '未知驾驶员'}
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                      创建时间: {new Date(code.createdAt).toLocaleDateString()}
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                      扫描次数: {code._count?.records || 0}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2">
+                                      <Switch
+                                        checked={code.isActive}
+                                        onCheckedChange={() => handleToggleCode(code.id)}
+                                        disabled={isLoading}
+                                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
+                                      />
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleDownloadQRCode(code.code, code.vehicle.licensePlate)}
+                                      disabled={isLoading}
+                                    >
+                                      <Download className="h-4 w-4" />
+                                    </Button>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          size="sm"
+                                          variant="destructive"
+                                          disabled={isLoading}
+                                          onClick={() => setCodeToDelete(code)}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>确认删除挪车码</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            您确定要删除挪车码 "{codeToDelete?.code}" 吗？
+                                            {codeToDelete && codeToDelete._count?.records && codeToDelete._count.records > 0 && (
+                                              <div className="mt-2 text-red-600">
+                                                注意：该挪车码还有 {codeToDelete._count.records} 条扫描记录，删除后无法恢复。
+                                              </div>
+                                            )}
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>取消</AlertDialogCancel>
+                                          <AlertDialogAction 
+                                            onClick={handleDeleteCode}
+                                            className="bg-red-600 hover:bg-red-700"
+                                            disabled={isLoading}
+                                          >
+                                            {isLoading ? (
+                                              <div className="flex items-center justify-center">
+                                                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                                删除中...
+                                              </div>
+                                            ) : (
+                                              '删除'
+                                            )}
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </TabsContent>
+                      </Tabs>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -1556,6 +1999,403 @@ export default function Home() {
           </div>
         </Tabs>
       </div>
+
+      {/* 驾驶员管理对话框 */}
+      <Dialog open={isDriverDialogOpen} onOpenChange={setIsDriverDialogOpen}>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              管理代开驾驶员 - {vehicles.find(v => v.id === currentVehicleId)?.licensePlate}
+            </DialogTitle>
+            <DialogDescription>
+              为车辆管理代开驾驶员，支持驾驶员信息的增删改查以及挪车码生成
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* 添加驾驶员按钮 */}
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">代开驾驶员管理</h3>
+                <p className="text-sm text-gray-500">为车辆 {vehicles.find(v => v.id === currentVehicleId)?.licensePlate} 管理代开驾驶员</p>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button onClick={() => {
+                    setDriverForm({
+                      name: '',
+                      phone: '',
+                      licenseNumber: '',
+                      dingtalkWebhook: '',
+                      dingtalkSign: false,
+                      dingtalkSecret: '',
+                      dingtalkKeyword: '',
+                      wechatWebhook: ''
+                    })
+                  }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    添加驾驶员
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>添加代开驾驶员</DialogTitle>
+                    <DialogDescription>填写驾驶员基本信息</DialogDescription>
+                  </DialogHeader>
+                  
+                  <Tabs defaultValue="basic" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="basic">基础信息</TabsTrigger>
+                      <TabsTrigger value="notification">通知配置</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="basic" className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="driverName" className="text-sm font-medium text-gray-700">姓名</Label>
+                        <Input 
+                          id="driverName"
+                          placeholder="请输入驾驶员姓名"
+                          value={driverForm.name}
+                          onChange={(e) => setDriverForm({...driverForm, name: e.target.value})}
+                          className="h-10"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="driverPhone" className="text-sm font-medium text-gray-700">手机号</Label>
+                        <Input 
+                          id="driverPhone"
+                          placeholder="请输入手机号"
+                          value={driverForm.phone}
+                          onChange={(e) => setDriverForm({...driverForm, phone: e.target.value})}
+                          className="h-10"
+                        />
+                      </div>
+                      <div className="space-y-2">
+
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="notification" className="space-y-4 mt-4">
+                      {/* 钉钉通知配置 */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium text-gray-700">钉钉通知配置（可选）</h4>
+                        <div className="space-y-2">
+                          <Label htmlFor="dingtalkWebhook" className="text-sm font-medium text-gray-700">钉钉Webhook地址</Label>
+                          <Input 
+                            id="dingtalkWebhook"
+                            placeholder="请输入钉钉机器人Webhook地址"
+                            value={driverForm.dingtalkWebhook}
+                            onChange={(e) => setDriverForm({...driverForm, dingtalkWebhook: e.target.value})}
+                            className="h-10"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            id="dingtalkSign"
+                            checked={driverForm.dingtalkSign}
+                            onCheckedChange={(checked) => setDriverForm({...driverForm, dingtalkSign: checked})}
+                          />
+                          <Label htmlFor="dingtalkSign" className="text-sm font-medium text-gray-700">是否加签</Label>
+                        </div>
+                        {driverForm.dingtalkSign && (
+                          <div className="space-y-2">
+                            <Label htmlFor="dingtalkSecret" className="text-sm font-medium text-gray-700">加签Secret</Label>
+                            <Input 
+                              id="dingtalkSecret"
+                              placeholder="请输入加签Secret"
+                              value={driverForm.dingtalkSecret}
+                              onChange={(e) => setDriverForm({...driverForm, dingtalkSecret: e.target.value})}
+                              className="h-10"
+                            />
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          <Label htmlFor="dingtalkKeyword" className="text-sm font-medium text-gray-700">关键词</Label>
+                          <Input 
+                            id="dingtalkKeyword"
+                            placeholder="请输入关键词"
+                            value={driverForm.dingtalkKeyword}
+                            onChange={(e) => setDriverForm({...driverForm, dingtalkKeyword: e.target.value})}
+                            className="h-10"
+                          />
+                        </div>
+                      </div>
+
+                      {/* 企微通知配置 */}
+                      <div className="space-y-4 border-t pt-4">
+                        <h4 className="text-sm font-medium text-gray-700">企微通知配置（可选）</h4>
+                        <div className="space-y-2">
+                          <Label htmlFor="wechatWebhook" className="text-sm font-medium text-gray-700">企微Webhook地址</Label>
+                          <Input 
+                            id="wechatWebhook"
+                            placeholder="请输入企业微信机器人Webhook地址"
+                            value={driverForm.wechatWebhook}
+                            onChange={(e) => setDriverForm({...driverForm, wechatWebhook: e.target.value})}
+                            className="h-10"
+                          />
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                  
+                  <Button 
+                    className="w-full mt-4" 
+                    disabled={isLoading}
+                    onClick={handleAddDriver}
+                  >
+                    {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                    添加驾驶员
+                  </Button>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* 驾驶员列表 */}
+            <Card>
+              <CardContent className="p-0">
+                {drivers.filter(d => d.vehicleId === currentVehicleId).length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">暂无代开驾驶员，请先添加驾驶员</p>
+                  </div>
+                ) : (
+                  <div className="border rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>姓名</TableHead>
+                          <TableHead>手机号</TableHead>
+
+                          <TableHead>状态</TableHead>
+                          <TableHead>添加时间</TableHead>
+                          <TableHead>操作</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {drivers.filter(d => d.vehicleId === currentVehicleId).map((driver) => (
+                          <TableRow key={driver.id}>
+                            <TableCell className="font-medium">{driver.name}</TableCell>
+                            <TableCell>{driver.phone}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={true}
+                                  onCheckedChange={() => {}}
+                                  className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
+                                />
+                              </div>
+                            </TableCell>
+                            <TableCell>{driver.createdAt ? new Date(driver.createdAt).toLocaleDateString() : ''}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="编辑驾驶员"
+                                  onClick={() => handleEditDriver(driver)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="删除驾驶员"
+                                  onClick={() => handleDeleteDriver(driver)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="生成二维码"
+                                  onClick={() => handleDownloadQRCode(driver.id)}
+                                >
+                                  <QrCode className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={true}
+                                    onCheckedChange={() => {}}
+                                    className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
+                                  />
+                                </div>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="编辑驾驶员"
+                                  onClick={() => handleEditDriver(driver)}
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="生成挪车码"
+                                  onClick={() => handleGenerateDriverCode(driver)}
+                                >
+                                  <QrCode className="h-3 w-3" />
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button size="sm" variant="destructive" title="删除驾驶员">
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>确认删除驾驶员</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        您确定要删除驾驶员 "{driver.name}" 吗？此操作不可撤销。
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>取消</AlertDialogCancel>
+                                      <AlertDialogAction 
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => handleDeleteDriver(driver.id)}
+                                      >
+                                        确认删除
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 编辑驾驶员对话框 */}
+      <Dialog open={isEditDriverDialogOpen} onOpenChange={setIsEditDriverDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>编辑代开驾驶员</DialogTitle>
+            <DialogDescription>修改驾驶员基本信息</DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">基础信息</TabsTrigger>
+              <TabsTrigger value="notification">通知配置</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic" className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="editDriverName" className="text-sm font-medium text-gray-700">姓名</Label>
+                <Input 
+                  id="editDriverName"
+                  placeholder="请输入驾驶员姓名"
+                  value={driverForm.name}
+                  onChange={(e) => setDriverForm({...driverForm, name: e.target.value})}
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editDriverPhone" className="text-sm font-medium text-gray-700">手机号</Label>
+                <Input 
+                  id="editDriverPhone"
+                  placeholder="请输入手机号"
+                  value={driverForm.phone}
+                  onChange={(e) => setDriverForm({...driverForm, phone: e.target.value})}
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editDriverLicense" className="text-sm font-medium text-gray-700">驾驶证号</Label>
+                <Input 
+                  id="editDriverLicense"
+                  placeholder="请输入驾驶证号"
+
+                  className="h-10"
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="notification" className="space-y-4 mt-4">
+              {/* 钉钉通知配置 */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-gray-700">钉钉通知配置（可选）</h4>
+                <div className="space-y-2">
+                  <Label htmlFor="editDingtalkWebhook" className="text-sm font-medium text-gray-700">钉钉Webhook地址</Label>
+                  <Input 
+                    id="editDingtalkWebhook"
+                    placeholder="请输入钉钉机器人Webhook地址"
+                    value={driverForm.dingtalkWebhook}
+                    onChange={(e) => setDriverForm({...driverForm, dingtalkWebhook: e.target.value})}
+                    className="h-10"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="editDingtalkSign"
+                    checked={driverForm.dingtalkSign}
+                    onCheckedChange={(checked) => setDriverForm({...driverForm, dingtalkSign: checked})}
+                  />
+                  <Label htmlFor="editDingtalkSign" className="text-sm font-medium text-gray-700">是否加签</Label>
+                </div>
+                {driverForm.dingtalkSign && (
+                  <div className="space-y-2">
+                    <Label htmlFor="editDingtalkSecret" className="text-sm font-medium text-gray-700">加签Secret</Label>
+                    <Input 
+                      id="editDingtalkSecret"
+                      placeholder="请输入加签Secret"
+                      value={driverForm.dingtalkSecret}
+                      onChange={(e) => setDriverForm({...driverForm, dingtalkSecret: e.target.value})}
+                      className="h-10"
+                    />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="editDingtalkKeyword" className="text-sm font-medium text-gray-700">关键词</Label>
+                  <Input 
+                    id="editDingtalkKeyword"
+                    placeholder="请输入关键词"
+                    value={driverForm.dingtalkKeyword}
+                    onChange={(e) => setDriverForm({...driverForm, dingtalkKeyword: e.target.value})}
+                    className="h-10"
+                  />
+                </div>
+              </div>
+
+              {/* 企微通知配置 */}
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="text-sm font-medium text-gray-700">企微通知配置（可选）</h4>
+                <div className="space-y-2">
+                  <Label htmlFor="editWechatWebhook" className="text-sm font-medium text-gray-700">企微Webhook地址</Label>
+                  <Input 
+                    id="editWechatWebhook"
+                    placeholder="请输入企业微信机器人Webhook地址"
+                    value={driverForm.wechatWebhook}
+                    onChange={(e) => setDriverForm({...driverForm, wechatWebhook: e.target.value})}
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <Button 
+            className="w-full mt-4" 
+            disabled={isLoading}
+            onClick={handleUpdateDriver}
+          >
+            {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+            更新驾驶员信息
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

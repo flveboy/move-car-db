@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 
 interface AuthUser {
   id: string
+  username: string
   phone: string
   name: string
   email?: string
@@ -14,7 +15,7 @@ interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null
   token: string | null
-  login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   isLoading: boolean
@@ -22,10 +23,12 @@ interface AuthContextType {
 }
 
 interface RegisterData {
+  username: string
   phone: string
   name: string
   email?: string
   password: string
+  confirmPassword: string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -73,23 +76,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // 登录
-  const login = async (phone: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ phone, password })
+        body: JSON.stringify({ username, password })
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setUser(data.user)
-        setToken(data.token)
-        localStorage.setItem('auth_token', data.token)
-        return { success: true }
+        // 检查是否有用户数据和token
+        if (data.user && data.token) {
+          setUser(data.user)
+          setToken(data.token)
+          localStorage.setItem('auth_token', data.token)
+          return { success: true }
+        } else {
+          // 处理用户不存在的情况
+          return { success: false, error: data.error }
+        }
       } else {
         return { success: false, error: data.error }
       }

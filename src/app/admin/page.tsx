@@ -34,6 +34,7 @@ interface User {
 }
 
 interface CreateUserData {
+  username: string
   phone: string
   name: string
   email?: string
@@ -45,7 +46,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [roleFilter, setRoleFilter] = useState<string>('')
+  const [roleFilter, setRoleFilter] = useState<string>('ALL')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalUsers, setTotalUsers] = useState(0)
@@ -53,6 +54,7 @@ export default function AdminPage() {
   // 创建用户对话框
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [createUserForm, setCreateUserForm] = useState<CreateUserData>({
+    username: '',
     phone: '',
     name: '',
     email: '',
@@ -75,7 +77,7 @@ export default function AdminPage() {
         page: currentPage.toString(),
         limit: '10',
         ...(searchTerm && { search: searchTerm }),
-        ...(roleFilter && { role: roleFilter })
+        ...(roleFilter && roleFilter !== 'ALL' && { role: roleFilter })
       })
       
       const response = await fetch(`/api/admin/users?${params}`, {
@@ -174,9 +176,11 @@ export default function AdminPage() {
         })
         fetchUsers()
       } else {
+        // 获取后端返回的错误信息
+        const errorData = await response.json()
         toast({
           title: "更新失败",
-          description: "请稍后重试",
+          description: errorData.error || "请稍后重试",
           variant: "destructive"
         })
       }
@@ -212,9 +216,11 @@ export default function AdminPage() {
         setNewPassword('')
         setSelectedUser(null)
       } else {
+        // 获取后端返回的错误信息
+        const errorData = await response.json()
         toast({
           title: "密码重置失败",
-          description: "请稍后重试",
+          description: errorData.error || "请稍后重试",
           variant: "destructive"
         })
       }
@@ -240,14 +246,18 @@ export default function AdminPage() {
       })
       
       if (response.ok) {
+        const result = await response.json()
         toast({
-          title: "用户删除成功"
+          title: "用户删除成功",
+          description: result.message || "用户及其相关数据已删除"
         })
         fetchUsers()
       } else {
+        // 获取后端返回的错误信息
+        const errorData = await response.json()
         toast({
           title: "删除失败",
-          description: "请稍后重试",
+          description: errorData.error || "请稍后重试",
           variant: "destructive"
         })
       }
@@ -293,6 +303,15 @@ export default function AdminPage() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="username">用户名</Label>
+                        <Input
+                          id="username"
+                          value={createUserForm.username}
+                          onChange={(e) => setCreateUserForm({ ...createUserForm, username: e.target.value })}
+                          placeholder="请输入用户名"
+                        />
+                      </div>
                       <div>
                         <Label htmlFor="phone">手机号</Label>
                         <Input
@@ -361,7 +380,7 @@ export default function AdminPage() {
                     <SelectValue placeholder="角色筛选" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">全部角色</SelectItem>
+                    <SelectItem value="ALL">全部角色</SelectItem>
                     <SelectItem value="USER">普通用户</SelectItem>
                     <SelectItem value="ADMIN">管理员</SelectItem>
                   </SelectContent>
@@ -476,21 +495,27 @@ export default function AdminPage() {
                                 </DialogContent>
                               </Dialog>
                               
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleToggleUserStatus(user.id, !user.isActive)}
-                              >
-                                {user.isActive ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
-                              </Button>
+                              {/* 禁用/启用按钮 - admin账号不能禁用 */}
+                              {user.username !== 'admin' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleToggleUserStatus(user.id, !user.isActive)}
+                                >
+                                  {user.isActive ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                                </Button>
+                              )}
                               
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteUser(user.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              {/* 删除按钮 - admin账号不能删除 */}
+                              {user.username !== 'admin' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteUser(user.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>

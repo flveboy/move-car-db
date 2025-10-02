@@ -10,10 +10,10 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
-import { Loader2, Phone, Lock } from 'lucide-react'
+import { Loader2, Phone, Lock, User } from 'lucide-react'
 
 const loginSchema = z.object({
-  phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
+  username: z.string().min(1, '请输入用户名'),
   password: z.string().min(1, '请输入密码')
 })
 
@@ -42,7 +42,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     setError(null)
 
     try {
-      const result = await login(data.phone, data.password)
+      const result = await login(data.username, data.password)
       
       if (result.success) {
         onSuccess?.()
@@ -60,9 +60,11 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>用户登录</CardTitle>
+
         <CardDescription>
-          请输入您的手机号和密码进行登录
+          请输入您的账号和密码进行登录
         </CardDescription>
+
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
@@ -73,19 +75,19 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="phone">手机号</Label>
+            <Label htmlFor="username">用户名</Label>
             <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                id="phone"
-                type="tel"
-                placeholder="请输入手机号"
+                id="username"
+                type="text"
+                placeholder="请输入用户名"
                 className="pl-10"
-                {...register('phone')}
+                {...register('username')}
               />
             </div>
-            {errors.phone && (
-              <p className="text-sm text-red-500">{errors.phone.message}</p>
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username.message}</p>
             )}
           </div>
 

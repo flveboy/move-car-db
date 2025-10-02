@@ -11,6 +11,7 @@ function generateCode(): string {
 // 创建挪车码的验证模式
 const createCodeSchema = z.object({
   vehicleId: z.string().min(1, '车辆ID不能为空'),
+  driverId: z.string().optional().nullable(),
   expiredAt: z.string().datetime().optional().nullable(),
 })
 
@@ -54,7 +55,9 @@ export async function POST(request: NextRequest) {
     // 检查车辆是否存在且属于当前用户
     const vehicle = await db.vehicle.findUnique({
       where: { id: validatedData.vehicleId },
-      include: { owner: true }
+      include: { 
+        owner: true
+      }
     })
     
     if (!vehicle) {
@@ -72,6 +75,32 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    // 如果指定了代开驾驶员，验证驾驶员是否存在且属于该车辆
+    let driver = null
+    if (validatedData.driverId) {
+      // 支持两种查询方式：
+      // 1. 通过driverId（UUID）查询
+      // 2. 通过phone查询（当driverId是手机号格式时）
+      const isPhoneNumber = /^1[3-9]\d{9}$/.test(validatedData.driverId)
+      
+      driver = await db.driver.findFirst({
+        where: {
+          vehicleId: validatedData.vehicleId,
+          OR: [
+            { id: validatedData.driverId },
+            ...(isPhoneNumber ? [{ phone: validatedData.driverId }] : [])
+          ]
+        }
+      })
+      
+      if (!driver) {
+        return NextResponse.json(
+          { error: '代开驾驶员不存在或不属于该车辆' },
+          { status: 404 }
+        )
+      }
+    }
+
     // 生成唯一的挪车码
     let code
     let attempts = 0
@@ -94,6 +123,7 @@ export async function POST(request: NextRequest) {
       data: {
         vehicleId: validatedData.vehicleId,
         ownerId: vehicle.ownerId,
+        driverId: driver?.id || null,  // 使用查询到的驾驶员ID
         code: code,
         isActive: true,
         expiredAt: validatedData.expiredAt ? new Date(validatedData.expiredAt) : null,
@@ -117,6 +147,18 @@ export async function POST(request: NextRequest) {
             phone: true,
           },
         },
+        driver: validatedData.driverId ? {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            dingtalkWebhook: true,
+            dingtalkSign: true,
+            dingtalkKeyword: true,
+            dingtalkSecret: true,
+            wechatWebhook: true,
+          },
+        } : undefined,
       },
     })
     
@@ -193,6 +235,13 @@ export async function GET(request: NextRequest) {
             },
           },
           owner: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
+          driver: {
             select: {
               id: true,
               name: true,

@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Loader2, Phone, User, Mail, Lock } from 'lucide-react'
 
 const registerSchema = z.object({
+  username: z.string().min(3, '用户名至少3个字符').max(20, '用户名最多20个字符'),
   phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
   name: z.string().min(2, '姓名至少2个字符'),
   email: z.string().email('请输入有效的邮箱地址').optional().or(z.literal('')),
@@ -23,7 +24,10 @@ const registerSchema = z.object({
   path: ['confirmPassword']
 })
 
-type RegisterFormData = z.infer<typeof registerSchema>
+type RegisterFormData = z.infer<typeof registerSchema> & {
+  username: string
+  confirmPassword: string
+}
 
 interface RegisterFormProps {
   onSuccess?: () => void
@@ -49,10 +53,12 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
     try {
       const result = await registerUser({
+        username: data.username,
         phone: data.phone,
         name: data.name,
         email: data.email || undefined,
-        password: data.password
+        password: data.password,
+        confirmPassword: data.confirmPassword
       })
       
       if (result.success) {
@@ -83,6 +89,23 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
             </Alert>
           )}
           
+          <div className="space-y-2">
+            <Label htmlFor="username">用户名</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="username"
+                type="text"
+                placeholder="请输入用户名"
+                className="pl-10"
+                {...register('username')}
+              />
+            </div>
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username.message}</p>
+            )}
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="phone">手机号</Label>
             <div className="relative">
