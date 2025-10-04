@@ -10,6 +10,7 @@ interface AuthUser {
   name: string
   email?: string
   role: string
+  createdAt: string
 }
 
 interface AuthContextType {

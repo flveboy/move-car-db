@@ -6,623 +6,56 @@
 > Ready on http://0.0.0.0:3000
 > Socket.IO server running at ws://0.0.0.0:3000/api/socketio
  ○ Compiling / ...
- ✓ Compiled / in 12.6s (1897 modules)
- GET / 200 in 14160ms
- GET / 200 in 502ms
+ ✓ Compiled / in 12.7s (1881 modules)
+ GET / 200 in 16591ms
  ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 3s (1901 modules)
- GET /icons/icon_zh_48.png 404 in 3382ms
- ⚠ Cross origin request detected from 192.168.125.117 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+ ✓ Compiled /_not-found in 2.7s (1885 modules)
+ GET /icons/icon_zh_48.png 404 in 3824ms
+ ⚠ Cross origin request detected from 172.20.10.2 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
 Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
  ○ Compiling /api/auth/me ...
- ✓ Compiled /api/auth/me in 2.2s (1986 modules)
+ ✓ Compiled /api/auth/me in 1150ms (1984 modules)
 prisma:info Starting a mysql pool with 5 connections.
 prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`phone`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`email`, `movecartest3`.`owners`.`role`, `movecartest3`.`owners`.`isActive`, `movecartest3`.`owners`.`createdAt`, `movecartest3`.`owners`.`lastLogin` FROM `movecartest3`.`owners` WHERE (`movecartest3`.`owners`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
- GET /api/auth/me 200 in 5381ms
- ○ Compiling /api/vehicles ...
- ✓ Compiled /api/vehicles in 2.9s (2059 modules)
- GET /api/records/owner/me 401 in 3445ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt`, COALESCE(`aggr_selection_0_Code`.`_aggr_count_codes`, 0) AS `_aggr_count_codes` FROM `movecartest3`.`Vehicle` LEFT JOIN (SELECT `movecartest3`.`Code`.`vehicleId`, COUNT(*) AS `_aggr_count_codes` FROM `movecartest3`.`Code` WHERE 1=1 GROUP BY `movecartest3`.`Code`.`vehicleId`) AS `aggr_selection_0_Code` ON (`movecartest3`.`Vehicle`.`id` = `aggr_selection_0_Code`.`vehicleId`) WHERE `movecartest3`.`Vehicle`.`ownerId` = ? ORDER BY `movecartest3`.`Vehicle`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes 200 in 5026ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`vehicleId` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/vehicles 200 in 5539ms
- ○ Compiling /api/vehicles/[id]/drivers ...
- ✓ Compiled /api/vehicles/[id]/drivers in 2.4s (1982 modules)
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 4484ms
- ○ Compiling /api/vehicles/[id]/drivers/[driverId] ...
- ✓ Compiled /api/vehicles/[id]/drivers/[driverId] in 1024ms (1984 modules)
- PATCH /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers/cmg6rjjfy00014mrxbgwvw6q8 405 in 2368ms
- ✓ Compiled /api/codes in 432ms (1182 modules)
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 1983ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 314ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 161ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 951ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 460ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 239ms
- PATCH /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers/cmg6rjjfy00014mrxbgwvw6q8 405 in 22ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 1064ms (2056 modules)
- GET /scan?code=NCMUDJ6074V 404 in 1311ms
- GET /scan?code=NCMUDJ6074V 404 in 37ms
- GET /scan?code=NCMUDJ6074V 404 in 70ms
- ○ Compiling /scan/[code] ...
- ✓ Compiled /scan/[code] in 3s (2077 modules)
- GET /scan/NCMUDJ6074V 200 in 5335ms
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
- ⚠ Cross origin request detected from 192.168.125.117 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
- ○ Compiling / ...
- ✓ Compiled / in 17.5s (1901 modules)
- GET /_next/static/webpack/8810efb16f41f4a5.webpack.hot-update.json 404 in 20646ms
- GET / 200 in 21142ms
- GET /icons/icon_zh_48.png 404 in 120ms
- ○ Compiling /api/auth/me ...
- ✓ Compiled /api/auth/me in 1618ms (1986 modules)
-prisma:info Starting a mysql pool with 5 connections.
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`phone`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`email`, `movecartest3`.`owners`.`role`, `movecartest3`.`owners`.`isActive`, `movecartest3`.`owners`.`createdAt`, `movecartest3`.`owners`.`lastLogin` FROM `movecartest3`.`owners` WHERE (`movecartest3`.`owners`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
- GET /api/auth/me 200 in 4613ms
- ○ Compiling /api/records/owner/me ...
- ✓ Compiled /api/records/owner/me in 3.2s (2059 modules)
- GET /api/records/owner/me 401 in 3985ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt`, COALESCE(`aggr_selection_0_Code`.`_aggr_count_codes`, 0) AS `_aggr_count_codes` FROM `movecartest3`.`Vehicle` LEFT JOIN (SELECT `movecartest3`.`Code`.`vehicleId`, COUNT(*) AS `_aggr_count_codes` FROM `movecartest3`.`Code` WHERE 1=1 GROUP BY `movecartest3`.`Code`.`vehicleId`) AS `aggr_selection_0_Code` ON (`movecartest3`.`Vehicle`.`id` = `aggr_selection_0_Code`.`vehicleId`) WHERE `movecartest3`.`Vehicle`.`ownerId` = ? ORDER BY `movecartest3`.`Vehicle`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes 200 in 5402ms
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`vehicleId` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/vehicles 200 in 6248ms
- ○ Compiling /api/vehicles/[id]/drivers ...
- ✓ Compiled /api/vehicles/[id]/drivers in 1081ms (2061 modules)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 3430ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 1483ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 347ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 170ms
- ○ Compiling /api/vehicles/[id]/drivers/[driverId] ...
- ✓ Compiled /api/vehicles/[id]/drivers/[driverId] in 1488ms (2063 modules)
-prisma:query SELECT 1
-prisma:error 
-Invalid `prisma.driver.update()` invocation:
-
-{
-  where: {
-    id: "cmg6rjjfy00014mrxbgwvw6q8"
-  },
-  data: {
-    name: "龙 01",
-    phone: "13213233216",
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "https://oapi.dingtalk.com/robot/send?access_token=e402d27fb6058d8e5184fc80c5b74383acb237856ff0979eec9acc032de11c26",
-    dingtalkSign: true,
-    dingtalkSecret: "SEC3bfe5cfae6b29828d905206fa55864e75d73ba755444496e434d7416de84d70d",
-    dingtalkKeyword: "121",
-    wechatWebhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=4c9f3fb3-d65a-4066-b2cb-08a67b1e3491",
-?   id?: String | StringFieldUpdateOperationsInput,
-?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   vehicle?: VehicleUpdateOneRequiredWithoutDriversNestedInput,
-?   Code?: CodeUpdateManyWithoutDriverNestedInput
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-更新代开驾驶员错误: Error [PrismaClientValidationError]: 
-Invalid `prisma.driver.update()` invocation:
-
-{
-  where: {
-    id: "cmg6rjjfy00014mrxbgwvw6q8"
-  },
-  data: {
-    name: "龙 01",
-    phone: "13213233216",
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "https://oapi.dingtalk.com/robot/send?access_token=e402d27fb6058d8e5184fc80c5b74383acb237856ff0979eec9acc032de11c26",
-    dingtalkSign: true,
-    dingtalkSecret: "SEC3bfe5cfae6b29828d905206fa55864e75d73ba755444496e434d7416de84d70d",
-    dingtalkKeyword: "121",
-    wechatWebhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=4c9f3fb3-d65a-4066-b2cb-08a67b1e3491",
-?   id?: String | StringFieldUpdateOperationsInput,
-?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   vehicle?: VehicleUpdateOneRequiredWithoutDriversNestedInput,
-?   Code?: CodeUpdateManyWithoutDriverNestedInput
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-    at async PATCH (src/app/api/vehicles/[id]/drivers/[driverId]/route.ts:78:19)
-  76 |     
-  77 |     // 更新代开驾驶员信息
-> 78 |     const driver = await db.driver.update({
-     |                   ^
-  79 |       where: { id: driverId },
-  80 |       data: {
-  81 |         name: body.name, {
-  clientVersion: '6.16.2'
-}
- PATCH /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers/cmg6rjjfy00014mrxbgwvw6q8 500 in 4015ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 246ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 195ms
-prisma:query SELECT 1
-prisma:error 
-Invalid `prisma.driver.update()` invocation:
-
-{
-  where: {
-    id: "cmg6rjjfy00014mrxbgwvw6q8"
-  },
-  data: {
-    name: undefined,
-    phone: undefined,
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "",
-    dingtalkSign: false,
-    dingtalkSecret: "",
-    dingtalkKeyword: "",
-    wechatWebhook: "",
-?   id?: String | StringFieldUpdateOperationsInput,
-?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   vehicle?: VehicleUpdateOneRequiredWithoutDriversNestedInput,
-?   Code?: CodeUpdateManyWithoutDriverNestedInput
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-更新代开驾驶员错误: Error [PrismaClientValidationError]: 
-Invalid `prisma.driver.update()` invocation:
-
-{
-  where: {
-    id: "cmg6rjjfy00014mrxbgwvw6q8"
-  },
-  data: {
-    name: undefined,
-    phone: undefined,
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "",
-    dingtalkSign: false,
-    dingtalkSecret: "",
-    dingtalkKeyword: "",
-    wechatWebhook: "",
-?   id?: String | StringFieldUpdateOperationsInput,
-?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,
-?   vehicle?: VehicleUpdateOneRequiredWithoutDriversNestedInput,
-?   Code?: CodeUpdateManyWithoutDriverNestedInput
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-    at async PATCH (src/app/api/vehicles/[id]/drivers/[driverId]/route.ts:78:19)
-  76 |     
-  77 |     // 更新代开驾驶员信息
-> 78 |     const driver = await db.driver.update({
-     |                   ^
-  79 |       where: { id: driverId },
-  80 |       data: {
-  81 |         name: body.name, {
-  clientVersion: '6.16.2'
-}
- PATCH /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers/cmg6rjjfy00014mrxbgwvw6q8 500 in 652ms
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
- ○ Compiling / ...
- ✓ Compiled / in 22.4s (1895 modules)
- GET / 200 in 7523ms
- GET / 200 in 28351ms
- ○ Compiling /_not-found ...
- ⚠ Cross origin request detected from 192.168.125.117 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
- ✓ Compiled /api/auth/me in 13.9s (2145 modules)
- GET /icons/icon_zh_48.png 404 in 15930ms
-prisma:info Starting a mysql pool with 5 connections.
- GET /auth 200 in 16580ms
- GET / 200 in 4136ms
- GET /auth 200 in 743ms
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`phone`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`email`, `movecartest3`.`owners`.`role`, `movecartest3`.`owners`.`isActive`, `movecartest3`.`owners`.`createdAt`, `movecartest3`.`owners`.`lastLogin` FROM `movecartest3`.`owners` WHERE (`movecartest3`.`owners`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
- GET /api/auth/me 200 in 12037ms
- ○ Compiling /api/records/owner/me ...
- ✓ Compiled /api/records/owner/me in 5.6s (2218 modules)
- GET /api/records/owner/me 401 in 6633ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt`, COALESCE(`aggr_selection_0_Code`.`_aggr_count_codes`, 0) AS `_aggr_count_codes` FROM `movecartest3`.`Vehicle` LEFT JOIN (SELECT `movecartest3`.`Code`.`vehicleId`, COUNT(*) AS `_aggr_count_codes` FROM `movecartest3`.`Code` WHERE 1=1 GROUP BY `movecartest3`.`Code`.`vehicleId`) AS `aggr_selection_0_Code` ON (`movecartest3`.`Vehicle`.`id` = `aggr_selection_0_Code`.`vehicleId`) WHERE `movecartest3`.`Vehicle`.`ownerId` = ? ORDER BY `movecartest3`.`Vehicle`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes 200 in 8171ms
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`vehicleId` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/vehicles 200 in 8883ms
- ○ Compiling /api/vehicles/[id]/drivers ...
- ✓ Compiled /api/vehicles/[id]/drivers in 1872ms (2220 modules)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 4702ms
- ○ Compiling /api/vehicles/[id]/drivers/[driverId] ...
- ✓ Compiled /api/vehicles/[id]/drivers/[driverId] in 1986ms (2222 modules)
-prisma:query SELECT 1
-prisma:query BEGIN
-prisma:query SELECT `movecartest3`.`Driver`.`id` FROM `movecartest3`.`Driver` WHERE (`movecartest3`.`Driver`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query UPDATE `movecartest3`.`Driver` SET `name` = ?, `phone` = ?, `dingtalkWebhook` = ?, `dingtalkSign` = ?, `dingtalkSecret` = ?, `dingtalkKeyword` = ?, `wechatWebhook` = ?, `updatedAt` = ? WHERE (`movecartest3`.`Driver`.`id` IN (?) AND (`movecartest3`.`Driver`.`id` = ? AND 1=1))
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` = ? LIMIT ? OFFSET ?
-prisma:query COMMIT
- PATCH /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers/cmg6rjjfy00014mrxbgwvw6q8 200 in 5819ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 171ms
-prisma:query SELECT 1
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 1846ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 519ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 186ms
- GET /scan?code=NCMUDJ6074V 404 in 285ms
-prisma:query SELECT 1
-prisma:query SELECT 1
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 1582ms
- ○ Compiling /scan/[code] ...
- ✓ Compiled /scan/[code] in 10.6s (2060 modules)
- GET /scan/NCMUDJ6074V 200 in 16810ms
- ○ Compiling /api/codes/lookup/[code] ...
- ✓ Compiled /api/codes/lookup/[code] in 4.9s (2082 modules)
- GET /api/notifications/rate-limit 200 in 6293ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`expiredAt`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`vehicleId` FROM `movecartest3`.`Code` WHERE (`movecartest3`.`Code`.`code` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`phone`, `movecartest3`.`owners`.`name` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`name` FROM `movecartest3`.`Driver` WHERE (`movecartest3`.`Driver`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query BEGIN
-prisma:query INSERT INTO `movecartest3`.`records` (`id`,`codeId`,`ownerId`,`scanTime`,`ipAddress`,`userAgent`,`message`,`createdAt`) VALUES (?,?,?,?,?,?,?,?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`id` = ? LIMIT ? OFFSET ?
-prisma:query COMMIT
- GET /api/codes/lookup/NCMUDJ6074V 200 in 13327ms
- ○ Compiling /api/notifications/send-dingtalk ...
- ✓ Compiled /api/notifications/send-dingtalk in 1147ms (2084 modules)
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE (`movecartest3`.`Code`.`code` = ? AND `movecartest3`.`Code`.`vehicleId` IN (?))
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT 1
-prisma:query BEGIN
-prisma:query INSERT INTO `movecartest3`.`records` (`id`,`codeId`,`ownerId`,`scanTime`,`ipAddress`,`userAgent`,`message`,`createdAt`) VALUES (?,?,?,?,?,?,?,?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`id` = ? LIMIT ? OFFSET ?
- POST /api/notifications/send-dingtalk 200 in 5506ms
-prisma:query COMMIT
- ○ Compiling /api/notifications/send-wechat ...
- ✓ Compiled /api/notifications/send-wechat in 1359ms (2086 modules)
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE (`movecartest3`.`Code`.`code` = ? AND `movecartest3`.`Code`.`vehicleId` IN (?))
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`wechatWebhook` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query BEGIN
-prisma:query INSERT INTO `movecartest3`.`records` (`id`,`codeId`,`ownerId`,`scanTime`,`ipAddress`,`userAgent`,`message`,`createdAt`) VALUES (?,?,?,?,?,?,?,?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`id` = ? LIMIT ? OFFSET ?
-prisma:query COMMIT
- POST /api/notifications/send-wechat 200 in 4203ms
- ○ Compiling /api/vehicles/[id]/drivers ...
- ✓ Compiled /api/vehicles/[id]/drivers in 1769ms (1207 modules)
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 2403ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 160ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:error 
-Invalid `prisma.driver.create()` invocation:
-
-{
-  data: {
-    vehicleId: "cmg6ra92z00024m2k654sdr3p",
-    name: "龙 2",
-    phone: "121212121212",
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "",
-    dingtalkSign: false,
-    dingtalkSecret: "",
-    dingtalkKeyword: "",
-    wechatWebhook: "",
-?   id?: String,
-?   createdAt?: DateTime,
-?   updatedAt?: DateTime,
-?   Code?: CodeUncheckedCreateNestedManyWithoutDriverInput
-  },
-  include: {
-    vehicle: true
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-添加代开驾驶员错误: Error [PrismaClientValidationError]: 
-Invalid `prisma.driver.create()` invocation:
-
-{
-  data: {
-    vehicleId: "cmg6ra92z00024m2k654sdr3p",
-    name: "龙 2",
-    phone: "121212121212",
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "",
-    dingtalkSign: false,
-    dingtalkSecret: "",
-    dingtalkKeyword: "",
-    wechatWebhook: "",
-?   id?: String,
-?   createdAt?: DateTime,
-?   updatedAt?: DateTime,
-?   Code?: CodeUncheckedCreateNestedManyWithoutDriverInput
-  },
-  include: {
-    vehicle: true
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-    at async POST (src/app/api/vehicles/[id]/drivers/route.ts:103:19)
-  101 |
-  102 |     // 创建新的代开驾驶员
-> 103 |     const driver = await db.driver.create({
-      |                   ^
-  104 |       data: {
-  105 |         vehicleId,
-  106 |         name: body.name, {
-  clientVersion: '6.16.2'
-}
- POST /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 500 in 1338ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:error 
-Invalid `prisma.driver.create()` invocation:
-
-{
-  data: {
-    vehicleId: "cmg6ra92z00024m2k654sdr3p",
-    name: "龙 2",
-    phone: "12121212121",
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "",
-    dingtalkSign: false,
-    dingtalkSecret: "",
-    dingtalkKeyword: "",
-    wechatWebhook: "",
-?   id?: String,
-?   createdAt?: DateTime,
-?   updatedAt?: DateTime,
-?   Code?: CodeUncheckedCreateNestedManyWithoutDriverInput
-  },
-  include: {
-    vehicle: true
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-添加代开驾驶员错误: Error [PrismaClientValidationError]: 
-Invalid `prisma.driver.create()` invocation:
-
-{
-  data: {
-    vehicleId: "cmg6ra92z00024m2k654sdr3p",
-    name: "龙 2",
-    phone: "12121212121",
-    licenseNumber: "",
-    ~~~~~~~~~~~~~
-    isActive: true,
-    dingtalkWebhook: "",
-    dingtalkSign: false,
-    dingtalkSecret: "",
-    dingtalkKeyword: "",
-    wechatWebhook: "",
-?   id?: String,
-?   createdAt?: DateTime,
-?   updatedAt?: DateTime,
-?   Code?: CodeUncheckedCreateNestedManyWithoutDriverInput
-  },
-  include: {
-    vehicle: true
-  }
-}
-
-Unknown argument `licenseNumber`. Available options are marked with ?.
-    at async POST (src/app/api/vehicles/[id]/drivers/route.ts:103:19)
-  101 |
-  102 |     // 创建新的代开驾驶员
-> 103 |     const driver = await db.driver.create({
-      |                   ^
-  104 |       data: {
-  105 |         vehicleId,
-  106 |         name: body.name, {
-  clientVersion: '6.16.2'
-}
- POST /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 500 in 868ms
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
- ○ Compiling /api/vehicles/[id]/drivers ...
- ✓ Compiled /api/vehicles/[id]/drivers in 9.1s (446 modules)
-prisma:info Starting a mysql pool with 5 connections.
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `npx tsx server.ts`[39m
-> Ready on http://0.0.0.0:3000
-> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
- ○ Compiling / ...
- ✓ Compiled / in 29.6s (1895 modules)
- GET / 200 in 36436ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 3.6s (1899 modules)
- GET /icons/icon_zh_48.png 404 in 3886ms
- ⚠ Cross origin request detected from 192.168.125.117 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
- ○ Compiling /api/auth/me ...
- ✓ Compiled /api/auth/me in 3.2s (1984 modules)
-prisma:info Starting a mysql pool with 5 connections.
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`phone`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`email`, `movecartest3`.`owners`.`role`, `movecartest3`.`owners`.`isActive`, `movecartest3`.`owners`.`createdAt`, `movecartest3`.`owners`.`lastLogin` FROM `movecartest3`.`owners` WHERE (`movecartest3`.`owners`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
- GET /api/auth/me 200 in 7980ms
+ GET /api/auth/me 200 in 4830ms
  ○ Compiling /api/codes ...
- ✓ Compiled /api/records/owner/me in 6.2s (2057 modules)
- GET /api/records/owner/me 401 in 6829ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
- GET /api/codes 200 in 9322ms
+ ✓ Compiled /api/codes in 2.7s (2057 modules)
+ GET /api/records/owner/me 401 in 3681ms
 prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt`, COALESCE(`aggr_selection_0_Code`.`_aggr_count_codes`, 0) AS `_aggr_count_codes` FROM `movecartest3`.`Vehicle` LEFT JOIN (SELECT `movecartest3`.`Code`.`vehicleId`, COUNT(*) AS `_aggr_count_codes` FROM `movecartest3`.`Code` WHERE 1=1 GROUP BY `movecartest3`.`Code`.`vehicleId`) AS `aggr_selection_0_Code` ON (`movecartest3`.`Vehicle`.`id` = `aggr_selection_0_Code`.`vehicleId`) WHERE `movecartest3`.`Vehicle`.`ownerId` = ? ORDER BY `movecartest3`.`Vehicle`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
 prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
 prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`vehicleId` IN (?)
 prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/vehicles 200 in 10472ms
- ○ Compiling /api/vehicles/[id]/drivers ...
- ✓ Compiled /api/vehicles/[id]/drivers in 1054ms (2059 modules)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 3308ms
-prisma:query SELECT 1
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
+ GET /api/vehicles 200 in 4868ms
 prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
+prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
 prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
 prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
 prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
 prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
 prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 1544ms
+ GET /api/codes 200 in 8044ms
+ ○ Compiling /api/vehicles/[vehicleId]/drivers ...
+ ✓ Compiled /api/vehicles/[vehicleId]/drivers in 980ms (2059 modules)
+请求vehicleId: cmg6ra92z00024m2k654sdr3p
 prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 274ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 224ms
+查询结果: [
+  {
+    id: 'cmg6rjjfy00014mrxbgwvw6q8',
+    vehicleId: 'cmg6ra92z00024m2k654sdr3p',
+    name: '龙01',
+    phone: '13213233216',
+    dingtalkWebhook: 'https://oapi.dingtalk.com/robot/send?access_token=e402d27fb6058d8e5184fc80c5b74383acb237856ff0979eec9acc032de11c26',
+    dingtalkSign: true,
+    dingtalkKeyword: '121',
+    dingtalkSecret: 'SEC3bfe5cfae6b29828d905206fa55864e75d73ba755444496e434d7416de84d70d',
+    wechatWebhook: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=4c9f3fb3-d65a-4066-b2cb-08a67b1e3491',
+    createdAt: 2025-09-30T16:19:45.838Z,
+    updatedAt: 2025-10-01T18:08:50.545Z
+  }
+]
+ GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 3699ms
+请求vehicleId: cmg6ra92z00024m2k654sdr3p
 prisma:query SELECT 1
 prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
 prisma:query BEGIN
@@ -630,129 +63,67 @@ prisma:query INSERT INTO `movecartest3`.`Driver` (`id`,`vehicleId`,`name`,`phone
 prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` = ? LIMIT ? OFFSET ?
 prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
 prisma:query COMMIT
- POST /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 201 in 1640ms
+ POST /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 201 in 1598ms
+请求vehicleId: cmg6ra92z00024m2k654sdr3p
+查询结果: [
+  {
+    id: 'cmgc8s37v00014mee38umggel',
+    vehicleId: 'cmg6ra92z00024m2k654sdr3p',
+    name: '龙02-测试3',
+    phone: '12112131424',
+    dingtalkWebhook: '',
+    dingtalkSign: false,
+    dingtalkKeyword: '',
+    dingtalkSecret: '',
+    wechatWebhook: '',
+    createdAt: 2025-10-04T12:21:09.063Z,
+    updatedAt: 2025-10-04T12:21:09.063Z
+  },
+  {
+    id: 'cmg6rjjfy00014mrxbgwvw6q8',
+    vehicleId: 'cmg6ra92z00024m2k654sdr3p',
+    name: '龙01',
+    phone: '13213233216',
+    dingtalkWebhook: 'https://oapi.dingtalk.com/robot/send?access_token=e402d27fb6058d8e5184fc80c5b74383acb237856ff0979eec9acc032de11c26',
+    dingtalkSign: true,
+    dingtalkKeyword: '121',
+    dingtalkSecret: 'SEC3bfe5cfae6b29828d905206fa55864e75d73ba755444496e434d7416de84d70d',
+    wechatWebhook: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=4c9f3fb3-d65a-4066-b2cb-08a67b1e3491',
+    createdAt: 2025-09-30T16:19:45.838Z,
+    updatedAt: 2025-10-01T18:08:50.545Z
+  }
+]
+ GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 208ms
 prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 166ms
+请求vehicleId: cmg6ra92z00024m2k654sdr3p
 prisma:query SELECT 1
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
- GET /api/codes?driverId=cmg8bggmu00014mjz9ducxzx6 200 in 1924ms
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE (`movecartest3`.`Vehicle`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`username`, `movecartest3`.`owners`.`phone`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`email`, `movecartest3`.`owners`.`password`, `movecartest3`.`owners`.`role`, `movecartest3`.`owners`.`isActive`, `movecartest3`.`owners`.`createdAt`, `movecartest3`.`owners`.`updatedAt`, `movecartest3`.`owners`.`lastLogin` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE (`movecartest3`.`Driver`.`vehicleId` = ? AND `movecartest3`.`Driver`.`id` = ?) LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE (`movecartest3`.`Code`.`code` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query BEGIN
-prisma:query INSERT INTO `movecartest3`.`Code` (`id`,`vehicleId`,`ownerId`,`driverId`,`code`,`isActive`,`createdAt`,`updatedAt`,`expiredAt`) VALUES (?,?,?,?,?,?,?,?,?)
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`id` = ? LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query COMMIT
- POST /api/codes 200 in 3055ms
-prisma:query SELECT 1
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?,?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes 200 in 1384ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?,?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg8bggmu00014mjz9ducxzx6 200 in 1210ms
+查询结果: [
+  {
+    id: 'cmgc8s37v00014mee38umggel',
+    vehicleId: 'cmg6ra92z00024m2k654sdr3p',
+    name: '龙02-测试3',
+    phone: '12112131424',
+    dingtalkWebhook: '',
+    dingtalkSign: false,
+    dingtalkKeyword: '',
+    dingtalkSecret: '',
+    wechatWebhook: '',
+    createdAt: 2025-10-04T12:21:09.063Z,
+    updatedAt: 2025-10-04T12:21:09.063Z
+  },
+  {
+    id: 'cmg6rjjfy00014mrxbgwvw6q8',
+    vehicleId: 'cmg6ra92z00024m2k654sdr3p',
+    name: '龙01',
+    phone: '13213233216',
+    dingtalkWebhook: 'https://oapi.dingtalk.com/robot/send?access_token=e402d27fb6058d8e5184fc80c5b74383acb237856ff0979eec9acc032de11c26',
+    dingtalkSign: true,
+    dingtalkKeyword: '121',
+    dingtalkSecret: 'SEC3bfe5cfae6b29828d905206fa55864e75d73ba755444496e434d7416de84d70d',
+    wechatWebhook: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=4c9f3fb3-d65a-4066-b2cb-08a67b1e3491',
+    createdAt: 2025-09-30T16:19:45.838Z,
+    updatedAt: 2025-10-01T18:08:50.545Z
+  }
+]
+ GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 378ms
 prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 372ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 170ms
- ○ Compiling /api/vehicles/[id]/drivers/[driverId] ...
- ✓ Compiled /api/vehicles/[id]/drivers/[driverId] in 1972ms (2050 modules)
-prisma:query SELECT 1
-prisma:query BEGIN
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE (`movecartest3`.`Driver`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
-prisma:query DELETE FROM `movecartest3`.`Driver` WHERE (`movecartest3`.`Driver`.`id` = ? AND 1=1)
-prisma:query COMMIT
- DELETE /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers/cmg8bggmu00014mjz9ducxzx6 200 in 4550ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 191ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 173ms
- ○ Compiling /profile ...
- ✓ Compiled /profile in 4.3s (2073 modules)
- GET /profile 200 in 6099ms
- ○ Compiling /api/user/stats ...
- ✓ Compiled /api/user/stats in 2.3s (2073 modules)
-prisma:query SELECT 1
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`records`.`id` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`ownerId` = ?) AS `sub`
- GET /api/user/stats 200 in 3447ms
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
- GET /api/user/stats 200 in 567ms
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`records`.`id` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`ownerId` = ?) AS `sub`
- GET / 200 in 216ms
- ✓ Compiled /api/records/owner/me in 209ms (1226 modules)
- ✓ Compiled (1231 modules)
- GET /api/records/owner/me 401 in 1530ms
-prisma:query SELECT 1
-prisma:query SELECT 1
- GET /api/records/owner/me 401 in 80ms
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT 1
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt`, COALESCE(`aggr_selection_0_Code`.`_aggr_count_codes`, 0) AS `_aggr_count_codes` FROM `movecartest3`.`Vehicle` LEFT JOIN (SELECT `movecartest3`.`Code`.`vehicleId`, COUNT(*) AS `_aggr_count_codes` FROM `movecartest3`.`Code` WHERE 1=1 GROUP BY `movecartest3`.`Code`.`vehicleId`) AS `aggr_selection_0_Code` ON (`movecartest3`.`Vehicle`.`id` = `aggr_selection_0_Code`.`vehicleId`) WHERE `movecartest3`.`Vehicle`.`ownerId` = ? ORDER BY `movecartest3`.`Vehicle`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes 200 in 2539ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`vehicleId` IN (?)
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/vehicles 200 in 3029ms
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt`, COALESCE(`aggr_selection_0_Code`.`_aggr_count_codes`, 0) AS `_aggr_count_codes` FROM `movecartest3`.`Vehicle` LEFT JOIN (SELECT `movecartest3`.`Code`.`vehicleId`, COUNT(*) AS `_aggr_count_codes` FROM `movecartest3`.`Code` WHERE 1=1 GROUP BY `movecartest3`.`Code`.`vehicleId`) AS `aggr_selection_0_Code` ON (`movecartest3`.`Vehicle`.`id` = `aggr_selection_0_Code`.`vehicleId`) WHERE `movecartest3`.`Vehicle`.`ownerId` = ? ORDER BY `movecartest3`.`Vehicle`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Vehicle`.`id` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes 200 in 885ms
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`vehicleId` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/vehicles 200 in 631ms
- ✓ Compiled /api/vehicles/[id]/drivers in 468ms (1233 modules)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 819ms
-prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `movecartest3`.`Code`.`id` FROM `movecartest3`.`Code` WHERE `movecartest3`.`Code`.`ownerId` = ?) AS `sub`
-prisma:query SELECT `movecartest3`.`Code`.`id`, `movecartest3`.`Code`.`vehicleId`, `movecartest3`.`Code`.`ownerId`, `movecartest3`.`Code`.`driverId`, `movecartest3`.`Code`.`code`, `movecartest3`.`Code`.`isActive`, `movecartest3`.`Code`.`createdAt`, `movecartest3`.`Code`.`updatedAt`, `movecartest3`.`Code`.`expiredAt`, COALESCE(`aggr_selection_0_Record`.`_aggr_count_records`, 0) AS `_aggr_count_records` FROM `movecartest3`.`Code` LEFT JOIN (SELECT `movecartest3`.`records`.`codeId`, COUNT(*) AS `_aggr_count_records` FROM `movecartest3`.`records` WHERE 1=1 GROUP BY `movecartest3`.`records`.`codeId`) AS `aggr_selection_0_Record` ON (`movecartest3`.`Code`.`id` = `aggr_selection_0_Record`.`codeId`) WHERE `movecartest3`.`Code`.`ownerId` = ? ORDER BY `movecartest3`.`Code`.`createdAt` DESC LIMIT ? OFFSET ?
-prisma:query SELECT `movecartest3`.`Vehicle`.`id`, `movecartest3`.`Vehicle`.`ownerId`, `movecartest3`.`Vehicle`.`licensePlate`, `movecartest3`.`Vehicle`.`brand`, `movecartest3`.`Vehicle`.`model`, `movecartest3`.`Vehicle`.`color`, `movecartest3`.`Vehicle`.`dingtalkWebhook`, `movecartest3`.`Vehicle`.`dingtalkSign`, `movecartest3`.`Vehicle`.`dingtalkKeyword`, `movecartest3`.`Vehicle`.`dingtalkSecret`, `movecartest3`.`Vehicle`.`wechatWebhook`, `movecartest3`.`Vehicle`.`createdAt`, `movecartest3`.`Vehicle`.`updatedAt` FROM `movecartest3`.`Vehicle` WHERE `movecartest3`.`Vehicle`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`owners`.`id`, `movecartest3`.`owners`.`name`, `movecartest3`.`owners`.`phone` FROM `movecartest3`.`owners` WHERE `movecartest3`.`owners`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`id` IN (?)
-prisma:query SELECT `movecartest3`.`records`.`id`, `movecartest3`.`records`.`codeId`, `movecartest3`.`records`.`ownerId`, `movecartest3`.`records`.`scanTime`, `movecartest3`.`records`.`ipAddress`, `movecartest3`.`records`.`userAgent`, `movecartest3`.`records`.`location`, `movecartest3`.`records`.`message`, `movecartest3`.`records`.`createdAt` FROM `movecartest3`.`records` WHERE `movecartest3`.`records`.`codeId` IN (?,?) ORDER BY `movecartest3`.`records`.`createdAt` DESC
- GET /api/codes?driverId=cmg6rjjfy00014mrxbgwvw6q8 200 in 940ms
-prisma:query SELECT 1
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 453ms
-prisma:query SELECT `movecartest3`.`Driver`.`id`, `movecartest3`.`Driver`.`vehicleId`, `movecartest3`.`Driver`.`name`, `movecartest3`.`Driver`.`phone`, `movecartest3`.`Driver`.`dingtalkWebhook`, `movecartest3`.`Driver`.`dingtalkSign`, `movecartest3`.`Driver`.`dingtalkKeyword`, `movecartest3`.`Driver`.`dingtalkSecret`, `movecartest3`.`Driver`.`wechatWebhook`, `movecartest3`.`Driver`.`createdAt`, `movecartest3`.`Driver`.`updatedAt` FROM `movecartest3`.`Driver` WHERE `movecartest3`.`Driver`.`vehicleId` = ? ORDER BY `movecartest3`.`Driver`.`createdAt` DESC
- GET /api/vehicles/cmg6ra92z00024m2k654sdr3p/drivers 200 in 156ms

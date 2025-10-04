@@ -390,14 +390,16 @@ function ScanResultContent({ code }: { code: string }) {
   )
 }
 
-export default function ScanResultPage({ params }: { params: { code: string } }) {
+export default function ScanResultPage() {
+  const { code } = useParams()
+  const codeString = Array.isArray(code) ? code[0] : code
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     }>
-      <ScanResultContent code={params.code} />
+      {codeString && <ScanResultContent code={codeString} />}
     </Suspense>
   )
 }

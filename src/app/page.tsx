@@ -665,7 +665,6 @@ export default function Home() {
         setDriverForm({ 
           name: '', 
           phone: '', 
-          licenseNumber: '',
           dingtalkWebhook: '',
           dingtalkSign: false,
           dingtalkSecret: '',
@@ -673,6 +672,7 @@ export default function Home() {
           wechatWebhook: ''
         })
         alert('驾驶员添加成功')
+        setIsDriverDialogOpen(false) // 关闭添加对话框
       } else {
         alert(`添加驾驶员失败：${result.error || '未知错误'}`)
       }
@@ -725,7 +725,6 @@ export default function Home() {
         setDriverForm({ 
           name: '', 
           phone: '', 
-          licenseNumber: '',
           dingtalkWebhook: '',
           dingtalkSign: false,
           dingtalkSecret: '',
@@ -1409,8 +1408,6 @@ export default function Home() {
                                   onClick={() => { 
                                     setCurrentVehicleId(vehicle.id); 
                                     setIsDriverDialogOpen(true);
-                                    // 打开对话框后立即获取驾驶员数据
-                                    setTimeout(() => fetchDrivers(), 100);
                                   }}
                                   disabled={isLoading}
                                   title="管理代开驾驶员"
@@ -2008,7 +2005,7 @@ export default function Home() {
               管理代开驾驶员 - {vehicles.find(v => v.id === currentVehicleId)?.licensePlate}
             </DialogTitle>
             <DialogDescription>
-              为车辆管理代开驾驶员，支持驾驶员信息的增删改查以及挪车码生成
+              为车辆【{vehicles.find(v => v.id === currentVehicleId)?.licensePlate}】管理代开驾驶员，支持驾驶员信息的增删改查以及挪车码生成
             </DialogDescription>
           </DialogHeader>
           
@@ -2016,8 +2013,8 @@ export default function Home() {
             {/* 添加驾驶员按钮 */}
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">代开驾驶员管理</h3>
-                <p className="text-sm text-gray-500">为车辆 {vehicles.find(v => v.id === currentVehicleId)?.licensePlate} 管理代开驾驶员</p>
+                <h3 className="text-lg font-semibold text-gray-900"></h3>
+                {/* <p className="text-sm text-gray-500">为车辆 {vehicles.find(v => v.id === currentVehicleId)?.licensePlate} 管理代开驾驶员</p> */}
               </div>
               <Dialog>
                 <DialogTrigger asChild>
@@ -2025,7 +2022,6 @@ export default function Home() {
                     setDriverForm({
                       name: '',
                       phone: '',
-                      licenseNumber: '',
                       dingtalkWebhook: '',
                       dingtalkSign: false,
                       dingtalkSecret: '',
@@ -2200,7 +2196,7 @@ export default function Home() {
                                   size="sm" 
                                   variant="outline" 
                                   title="删除驾驶员"
-                                  onClick={() => handleDeleteDriver(driver)}
+                                  onClick={() => handleDeleteDriver(driver.id)}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -2208,7 +2204,12 @@ export default function Home() {
                                   size="sm" 
                                   variant="outline" 
                                   title="生成二维码"
-                                  onClick={() => handleDownloadQRCode(driver.id)}
+                                  onClick={() => {
+                                    const vehicle = vehicles.find(v => v.id === currentVehicleId);
+                                    if (vehicle?.licensePlate) {
+                                      handleDownloadQRCode(driver.id, vehicle.licensePlate);
+                                    }
+                                  }}
                                 >
                                   <QrCode className="h-4 w-4" />
                                 </Button>

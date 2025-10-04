@@ -76,20 +76,13 @@ export async function POST(request: NextRequest) {
     }
     
     // 如果指定了代开驾驶员，验证驾驶员是否存在且属于该车辆
-    let driver = null
+    let driver: { id: string } | null = null
     if (validatedData.driverId) {
-      // 支持两种查询方式：
-      // 1. 通过driverId（UUID）查询
-      // 2. 通过phone查询（当driverId是手机号格式时）
-      const isPhoneNumber = /^1[3-9]\d{9}$/.test(validatedData.driverId)
-      
+      // 仅支持UUID格式的driverId查询
       driver = await db.driver.findFirst({
         where: {
           vehicleId: validatedData.vehicleId,
-          OR: [
-            { id: validatedData.driverId },
-            ...(isPhoneNumber ? [{ phone: validatedData.driverId }] : [])
-          ]
+          id: validatedData.driverId
         }
       })
       
@@ -123,7 +116,7 @@ export async function POST(request: NextRequest) {
       data: {
         vehicleId: validatedData.vehicleId,
         ownerId: vehicle.ownerId,
-        driverId: driver?.id || null,  // 使用查询到的驾驶员ID
+        driverId: driver?.id ?? null,  // 使用更安全的null检查
         code: code,
         isActive: true,
         expiredAt: validatedData.expiredAt ? new Date(validatedData.expiredAt) : null,

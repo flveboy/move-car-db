@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
   try {
     // 验证token
     const authHeader = request.headers.get('authorization')
@@ -23,22 +23,24 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       )
     }
 
-    // 确保params已解析
-    const resolvedParams = await params
-    if (!resolvedParams?.id) {
+    // 从URL路径提取车辆ID - 修正路径解析
+    const pathSegments = request.nextUrl.pathname.split('/')
+    const vehicleId = pathSegments[pathSegments.indexOf('vehicles') + 1]
+    console.log('请求vehicleId:', vehicleId)  // 调试日志
+    
+    if (!vehicleId || vehicleId === 'drivers') {
       return NextResponse.json(
         { error: '缺少车辆ID参数' },
         { status: 400 }
       )
     }
-
-    const vehicleId = resolvedParams.id
     
     // 获取车辆的所有代开驾驶员
     const drivers = await db.driver.findMany({
       where: { vehicleId },
       orderBy: { createdAt: 'desc' }
     })
+    console.log('查询结果:', drivers)  // 调试日志
     
     return NextResponse.json({
       success: true,
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest) {
   try {
     // 验证token
     const authHeader = request.headers.get('authorization')
@@ -75,16 +77,19 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       )
     }
 
-    // 确保params已解析
-    const resolvedParams = await params
-    if (!resolvedParams?.id) {
+     // 从URL路径提取车辆ID - 修正路径解析
+    const pathSegments = request.nextUrl.pathname.split('/')
+    const vehicleId = pathSegments[pathSegments.indexOf('vehicles') + 1]
+    console.log('请求vehicleId:', vehicleId)  // 调试日志
+    
+    if (!vehicleId || vehicleId === 'drivers') {
       return NextResponse.json(
         { error: '缺少车辆ID参数' },
         { status: 400 }
       )
     }
 
-    const vehicleId = resolvedParams.id
+    
     const body = await request.json()
     
     // 验证车辆是否存在

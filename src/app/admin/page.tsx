@@ -19,6 +19,7 @@ import { zhCN } from 'date-fns/locale'
 
 interface User {
   id: string
+  username: string
   phone: string
   name: string
   email?: string
@@ -134,6 +135,7 @@ export default function AdminPage() {
         setIsCreateDialogOpen(false)
         setCreateUserForm({
           phone: '',
+          username: '',
           name: '',
           email: '',
           role: 'USER',
@@ -419,6 +421,7 @@ export default function AdminPage() {
                         <TableRow key={user.id}>
                           <TableCell>
                             <div>
+                              <div className="font-medium">{user.username}</div>
                               <div className="font-medium">{user.name}</div>
                               <div className="text-sm text-gray-500">{user.phone}</div>
                               {user.email && (
