@@ -15,6 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
 import { Header } from '@/components/layout/header'
 import { Car, QrCode, History, Plus, Trash2, Power, Download, Share2, Loader2, Edit, Users, Save } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -86,6 +87,7 @@ interface Record {
 
 export default function Home() {
   const { user, token, isLoading: authLoading } = useAuth()
+  const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('vehicles')
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
@@ -671,8 +673,13 @@ export default function Home() {
           dingtalkKeyword: '',
           wechatWebhook: ''
         })
-        alert('驾驶员添加成功')
-        setIsDriverDialogOpen(false) // 关闭添加对话框
+        toast({
+          title: "驾驶员添加成功",
+          description: `${driverForm.name} 已成功添加为代开驾驶员`,
+        })
+        // 只关闭添加对话框，保持管理界面打开
+        setIsDriverDialogOpen(true)
+        setIsEditDriverDialogOpen(false)
       } else {
         alert(`添加驾驶员失败：${result.error || '未知错误'}`)
       }
@@ -717,7 +724,7 @@ export default function Home() {
 
       const result = await response.json()
       
-      if (result.success) {
+      if (response.ok) {
         // 刷新驾驶员列表
         await fetchDrivers()
         setIsEditDriverDialogOpen(false)
@@ -731,13 +738,24 @@ export default function Home() {
           dingtalkKeyword: '',
           wechatWebhook: ''
         })
-        alert('驾驶员信息更新成功')
+        toast({
+          title: "更新成功",
+          description: `${driverForm.name} 的信息已更新`,
+        })
       } else {
-        alert(`更新驾驶员信息失败：${result.error || '未知错误'}`)
+        toast({
+          title: "更新失败",
+          description: result.error || '未知错误',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('更新驾驶员信息失败:', error)
-      alert('更新驾驶员信息失败，请检查网络连接')
+      toast({
+        title: "更新失败",
+        description: '更新驾驶员信息失败，请检查网络连接',
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -762,12 +780,10 @@ export default function Home() {
         if (existingCode) {
           // 如果已有挪车码，跳转到挪车码管理页面并高亮对应记录
           setActiveTab('codes')
-          setCodesTab('driver') // 切换到代开驾驶员挪车码tab
+          setCodesTab('driver')
           setHighlightedCodeId(existingCode.id)
           setIsDriverDialogOpen(false)
-          // 清空搜索框以确保挪车码可见
           setSearchTerm('')
-          //alert(`驾驶员 "${driver.name}" 已有挪车码，已跳转到挪车码管理页面`)
           return
         }
       }
@@ -791,18 +807,28 @@ export default function Home() {
         // 刷新挪车码列表
         await fetchCodes()
         setActiveTab('codes')
-        setCodesTab('driver') // 切换到代开驾驶员挪车码tab
+        setCodesTab('driver')
         setHighlightedCodeId(result.data.id)
         setIsDriverDialogOpen(false)
-        // 清空搜索框以确保挪车码可见
         setSearchTerm('')
-        alert('挪车码生成成功')
+        toast({
+          title: "挪车码生成成功",
+          description: `已为驾驶员 ${driver.name} 生成新的挪车码`,
+        })
       } else {
-        alert(`生成挪车码失败：${result.error || '未知错误'}`)
+        toast({
+          title: "生成挪车码失败",
+          description: result.error || '未知错误',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('生成挪车码失败:', error)
-      alert('生成挪车码失败，请检查网络连接')
+      toast({
+        title: "生成挪车码失败",
+        description: '请检查网络连接',
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -829,7 +855,10 @@ export default function Home() {
       if (result.success) {
         // 刷新驾驶员列表
         await fetchDrivers()
-        alert(`驾驶员已${isActive ? '启用' : '停用'}`)
+        toast({
+          title: `驾驶员已${isActive ? '启用' : '停用'}`,
+          description: `${editingDriver?.name || '驾驶员'} 已${isActive ? '启用' : '停用'}`,
+        })
       } else {
         alert(`切换驾驶员状态失败：${result.error || '未知错误'}`)
       }
@@ -843,13 +872,35 @@ export default function Home() {
 
   // 删除驾驶员函数
   const handleDeleteDriver = async (driverId: string) => {
-    if (!confirm('确定要删除这个驾驶员吗？此操作不可撤销。')) {
-      return
-    }
-
     setIsLoading(true)
     
     try {
+      // 获取并删除该驾驶员的所有挪车码
+      const codesResponse = await fetch(`/api/codes?driverId=${driverId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (codesResponse.ok) {
+        const codesData = await codesResponse.json()
+        // 只删除该驾驶员的挪车码
+        for (const code of codesData.data) {
+          if (code.driverId === driverId) {
+            const deleteResponse = await fetch(`/api/codes/${code.id}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            })
+            if (!deleteResponse.ok) {
+              throw new Error('删除挪车码失败')
+            }
+          }
+        }
+      }
+
+      // 然后删除驾驶员
       const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers/${driverId}`, {
         method: 'DELETE',
         headers: {
@@ -857,18 +908,24 @@ export default function Home() {
         }
       })
 
-      const result = await response.json()
-      
-      if (result.success) {
-        // 刷新驾驶员列表
-        await fetchDrivers()
-        alert('驾驶员删除成功')
-      } else {
-        alert(`删除驾驶员失败：${result.error || '未知错误'}`)
+      if (!response.ok) {
+        throw new Error('删除驾驶员失败')
       }
+
+      // 刷新驾驶员和挪车码列表
+      await fetchDrivers()
+      await fetchCodes()
+      toast({
+        title: "删除成功",
+        description: `驾驶员 ${editingDriver?.name || ''} 及其挪车码已删除`,
+      })
     } catch (error) {
       console.error('删除驾驶员失败:', error)
-      alert('删除驾驶员失败，请检查网络连接')
+      toast({
+        title: "删除失败",
+        description: error instanceof Error ? error.message : '未知错误',
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -2162,7 +2219,7 @@ export default function Home() {
                           <TableHead>姓名</TableHead>
                           <TableHead>手机号</TableHead>
 
-                          <TableHead>状态</TableHead>
+
                           <TableHead>添加时间</TableHead>
                           <TableHead>操作</TableHead>
                         </TableRow>
@@ -2172,18 +2229,15 @@ export default function Home() {
                           <TableRow key={driver.id}>
                             <TableCell className="font-medium">{driver.name}</TableCell>
                             <TableCell>{driver.phone}</TableCell>
+
+                            <TableCell>{driver.createdAt ? new Date(driver.createdAt).toLocaleDateString() : ''}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Switch
                                   checked={true}
-                                  onCheckedChange={() => {}}
+                                  onCheckedChange={() => handleToggleDriver(driver.id, !true)}
                                   className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
                                 />
-                              </div>
-                            </TableCell>
-                            <TableCell>{driver.createdAt ? new Date(driver.createdAt).toLocaleDateString() : ''}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
@@ -2195,55 +2249,15 @@ export default function Home() {
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
-                                  title="删除驾驶员"
-                                  onClick={() => handleDeleteDriver(driver.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
                                   title="生成二维码"
-                                  onClick={() => {
-                                    const vehicle = vehicles.find(v => v.id === currentVehicleId);
-                                    if (vehicle?.licensePlate) {
-                                      handleDownloadQRCode(driver.id, vehicle.licensePlate);
-                                    }
-                                  }}
-                                >
-                                  <QrCode className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2">
-                                  <Switch
-                                    checked={true}
-                                    onCheckedChange={() => {}}
-                                    className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
-                                  />
-                                </div>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  title="编辑驾驶员"
-                                  onClick={() => handleEditDriver(driver)}
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  title="生成挪车码"
                                   onClick={() => handleGenerateDriverCode(driver)}
                                 >
-                                  <QrCode className="h-3 w-3" />
+                                  <QrCode className="h-4 w-4" />
                                 </Button>
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
                                     <Button size="sm" variant="destructive" title="删除驾驶员">
-                                      <Trash2 className="h-3 w-3" />
+                                      <Trash2 className="h-4 w-4" />
                                     </Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
@@ -2313,15 +2327,7 @@ export default function Home() {
                   className="h-10"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="editDriverLicense" className="text-sm font-medium text-gray-700">驾驶证号</Label>
-                <Input 
-                  id="editDriverLicense"
-                  placeholder="请输入驾驶证号"
 
-                  className="h-10"
-                />
-              </div>
             </TabsContent>
             
             <TabsContent value="notification" className="space-y-4 mt-4">
