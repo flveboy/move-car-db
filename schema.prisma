@@ -65,6 +65,7 @@ model Driver {
   vehicleId       String
   name            String
   phone           String
+  isActive        Boolean  @default(true) // 新增：驾驶员启用状态
   // 钉钉通知配置
   dingtalkWebhook String?
   dingtalkSign    Boolean  @default(false)
