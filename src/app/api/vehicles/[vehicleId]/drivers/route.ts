@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
         vehicleId,
         name: body.name,
         phone: body.phone,
-
+        isActive: body.isActive !== undefined ? body.isActive : true, // 默认启用
         dingtalkWebhook: body.dingtalkWebhook || '',
         dingtalkSign: body.dingtalkSign || false,
         dingtalkSecret: body.dingtalkSecret || '',

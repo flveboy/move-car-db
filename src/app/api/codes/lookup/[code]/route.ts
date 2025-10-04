@@ -53,7 +53,8 @@ export async function GET(
         where: { id: codeRecord.driverId },
         select: {
           phone: true,
-          name: true
+          name: true,
+          isActive: true
         }
       }) : Promise.resolve(null)
     ])
@@ -83,6 +84,14 @@ export async function GET(
     if (codeRecord.expiredAt && new Date() > codeRecord.expiredAt) {
       return NextResponse.json(
         { error: '挪车码已过期' },
+        { status: 410 }
+      )
+    }
+
+    // 如果是代开驾驶员的挪车码，检查驾驶员是否启用
+    if (driver && !driver.isActive) {
+      return NextResponse.json(
+        { error: '该驾驶员已被停用，无法使用挪车码' },
         { status: 410 }
       )
     }

@@ -25,6 +25,7 @@ interface Driver {
   name: string
   phone: string
   vehicleId: string
+  isActive: boolean
   createdAt: string
   dingtalkWebhook?: string
   dingtalkSign?: boolean
@@ -846,7 +847,7 @@ export default function Home() {
     setIsLoading(true)
     
     try {
-      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers/${driverId}`, {
+      const response = await fetch(`/api/vehicles/${currentVehicleId}/drivers/${driverId}/toggle`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -862,7 +863,7 @@ export default function Home() {
         await fetchDrivers()
         toast({
           title: `驾驶员已${isActive ? '启用' : '停用'}`,
-          description: `${editingDriver?.name || '驾驶员'} 已${isActive ? '启用' : '停用'}`,
+          description: `${result.data.name || '驾驶员'} 已${isActive ? '启用' : '停用'}`,
         })
       } else {
         alert(`切换驾驶员状态失败：${result.error || '未知错误'}`)
@@ -2223,8 +2224,7 @@ export default function Home() {
                         <TableRow>
                           <TableHead>姓名</TableHead>
                           <TableHead>手机号</TableHead>
-
-
+                          <TableHead>状态</TableHead>
                           <TableHead>添加时间</TableHead>
                           <TableHead>操作</TableHead>
                         </TableRow>
@@ -2234,15 +2234,21 @@ export default function Home() {
                           <TableRow key={driver.id}>
                             <TableCell className="font-medium">{driver.name}</TableCell>
                             <TableCell>{driver.phone}</TableCell>
-
-                            <TableCell>{driver.createdAt ? new Date(driver.createdAt).toLocaleDateString() : ''}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Switch
-                                  checked={true}
-                                  onCheckedChange={() => handleToggleDriver(driver.id, !true)}
+                                  checked={driver.isActive}
+                                  onCheckedChange={(checked) => handleToggleDriver(driver.id, checked)}
                                   className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
                                 />
+                                <span className={`text-xs font-medium ${driver.isActive ? 'text-green-600' : 'text-gray-500'}`}>
+                                  {driver.isActive ? '启用' : '停用'}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{driver.createdAt ? new Date(driver.createdAt).toLocaleDateString() : ''}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
                                 <Button 
                                   size="sm" 
                                   variant="outline" 

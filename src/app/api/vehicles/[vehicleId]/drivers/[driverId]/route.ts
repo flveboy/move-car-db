@@ -80,6 +80,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       data: {
         name: body.name,
         phone: body.phone,
+        isActive: body.isActive !== undefined ? body.isActive : undefined,
         dingtalkWebhook: body.dingtalkWebhook || '',
         dingtalkSign: body.dingtalkSign || false,
         dingtalkSecret: body.dingtalkSecret || '',
@@ -133,6 +134,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       data: {
         name: body.name,
         phone: body.phone,
+        isActive: body.isActive !== undefined ? body.isActive : undefined,
         dingtalkWebhook: body.dingtalkWebhook,
         dingtalkSign: body.dingtalkSign,
         dingtalkKeyword: body.dingtalkKeyword,
