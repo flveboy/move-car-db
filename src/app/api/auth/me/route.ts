@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { verifyToken, getTokenFromHeader, formatAuthUser } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
       where: { id: payload.userId },
       select: {
         id: true,
+        username: true,
         phone: true,
         name: true,
         email: true,
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
     }
     
     return NextResponse.json({
-      user
+      user: formatAuthUser(user)
     })
     
   } catch (error) {

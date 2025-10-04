@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { authMiddleware, getCurrentUser } from '@/lib/middleware'
+import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    // 验证用户认证
-    const authResponse = await authMiddleware(request)
-    if (authResponse.status !== 200) {
-      return authResponse
+    // Get token from header
+    const authHeader = request.headers.get('authorization')
+    const token = getTokenFromHeader(authHeader || undefined)
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: '未提供认证令牌' },
+        { status: 401 }
+      )
     }
     
-    const currentUser = getCurrentUser(request)
-    if (!currentUser) {
+    // Verify token
+    const payload = verifyToken(token)
+    if (!payload) {
       return NextResponse.json(
-        { error: '用户认证失败' },
+        { error: '无效的认证令牌' },
         { status: 401 }
       )
     }
@@ -26,7 +32,7 @@ export async function GET(request: NextRequest) {
     // 获取用户的扫描记录
     const [records, total] = await Promise.all([
       db.record.findMany({
-        where: { ownerId: currentUser.id },
+        where: { ownerId: payload.userId },
         skip: offset,
         take: limit,
         orderBy: { scanTime: 'desc' },
@@ -44,7 +50,7 @@ export async function GET(request: NextRequest) {
           }
         }
       }),
-      db.record.count({ where: { ownerId: currentUser.id } })
+      db.record.count({ where: { ownerId: payload.userId } })
     ])
     
     return NextResponse.json({
