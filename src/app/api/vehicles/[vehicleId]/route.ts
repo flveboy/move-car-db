@@ -19,11 +19,20 @@ const updateVehicleSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ vehicleId: string }> }
 ) {
   try {
+    const { vehicleId } = await params
+    
+    if (!vehicleId) {
+      return NextResponse.json(
+        { error: '车辆ID不能为空' },
+        { status: 400 }
+      )
+    }
+    
     const vehicle = await db.vehicle.findUnique({
-      where: { id: (await params).id },
+      where: { id: vehicleId },
       include: {
         owner: {
           select: {
@@ -66,17 +75,25 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ vehicleId: string }> }
 ) {
   try {
     const body = await request.json()
+    const { vehicleId } = await params
+    
+    if (!vehicleId) {
+      return NextResponse.json(
+        { error: '车辆ID不能为空' },
+        { status: 400 }
+      )
+    }
     
     // 验证请求数据
     const validatedData = updateVehicleSchema.parse(body)
     
     // 检查车辆是否存在
     const existingVehicle = await db.vehicle.findUnique({
-      where: { id: (await params).id }
+      where: { id: vehicleId }
     })
     
     if (!existingVehicle) {
@@ -91,7 +108,7 @@ export async function PUT(
       const licensePlateVehicle = await db.vehicle.findFirst({
         where: { 
           licensePlate: validatedData.licensePlate,
-          id: { not: (await params).id }
+          id: { not: vehicleId }
         }
       })
       
@@ -105,7 +122,7 @@ export async function PUT(
     
     // 更新车辆信息
     const vehicle = await db.vehicle.update({
-      where: { id: (await params).id },
+      where: { id: vehicleId },
       data: validatedData,
       include: {
         owner: {
@@ -140,12 +157,21 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ vehicleId: string }> }
 ) {
   try {
+    const { vehicleId } = await params
+    
+    if (!vehicleId) {
+      return NextResponse.json(
+        { error: '车辆ID不能为空' },
+        { status: 400 }
+      )
+    }
+    
     // 检查车辆是否存在，并包含关联的所有信息
     const existingVehicle = await db.vehicle.findUnique({
-      where: { id: (await params).id },
+      where: { id: vehicleId },
       include: {
         codes: {
           include: {
@@ -189,20 +215,20 @@ export async function DELETE(
       // 2. 删除所有挪车码（包括车主和代开驾驶员的）
       await tx.code.deleteMany({
         where: {
-          vehicleId: (await params).id,
+          vehicleId: vehicleId,
         },
       })
       
       // 3. 删除所有代开驾驶员
       await tx.driver.deleteMany({
         where: {
-          vehicleId: (await params).id,
+          vehicleId: vehicleId,
         },
       })
       
       // 4. 最后删除车辆
       await tx.vehicle.delete({
-        where: { id: (await params).id },
+        where: { id: vehicleId },
       })
     })
     

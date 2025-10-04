@@ -62,6 +62,10 @@ interface Code {
   createdAt: string
   expiredAt?: string
   driverId?: string
+  driver?: {
+    id: string
+    name: string
+  }
   vehicle: {
     licensePlate: string
     brand?: string
@@ -96,6 +100,7 @@ export default function Home() {
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [isDriverDialogOpen, setIsDriverDialogOpen] = useState(false)
   const [isEditDriverDialogOpen, setIsEditDriverDialogOpen] = useState(false)
+  const [isAddDriverDialogOpen, setIsAddDriverDialogOpen] = useState(false)
   const [currentVehicleId, setCurrentVehicleId] = useState<string>('')
   const [driverForm, setDriverForm] = useState({
     name: '',
@@ -677,9 +682,9 @@ export default function Home() {
           title: "驾驶员添加成功",
           description: `${driverForm.name} 已成功添加为代开驾驶员`,
         })
-        // 只关闭添加对话框，保持管理界面打开
+        // 关闭添加对话框，保持管理界面打开
+        setIsAddDriverDialogOpen(false)
         setIsDriverDialogOpen(true)
-        setIsEditDriverDialogOpen(false)
       } else {
         alert(`添加驾驶员失败：${result.error || '未知错误'}`)
       }
@@ -934,7 +939,7 @@ export default function Home() {
   // 获取挪车码列表函数
   const fetchCodes = async () => {
     try {
-      const response = await fetch('/api/codes', {
+      const response = await fetch('/api/codes?includeDriver=true&includeVehicle=true', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1487,12 +1492,12 @@ export default function Home() {
                                       <AlertDialogTitle>确认删除车辆</AlertDialogTitle>
                                       <AlertDialogDescription>
                                         您确定要删除车牌号为 "{vehicleToDelete?.licensePlate}" 的车辆吗？
-                                        {vehicleToDelete && (vehicleToDelete._count?.codes || 0) > 0 && (
-                                          <div className="mt-2 text-orange-600">
-                                            注意：该车辆下还有 {(vehicleToDelete._count?.codes || 0)} 个挪车码，删除车辆时会同时删除这些挪车码及其所有扫描记录。
-                                          </div>
-                                        )}
                                       </AlertDialogDescription>
+                                      {vehicleToDelete && (vehicleToDelete._count?.codes || 0) > 0 && (
+                                        <div className="mt-2 text-orange-600 text-sm">
+                                          注意：该车辆下还有 {(vehicleToDelete._count?.codes || 0)} 个挪车码，删除车辆时会同时删除这些挪车码及其所有扫描记录。
+                                        </div>
+                                      )}
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>取消</AlertDialogCancel>
@@ -1695,7 +1700,7 @@ export default function Home() {
                                       {code.vehicle.licensePlate} {code.vehicle.brand}
                                     </div>
                                     <div className="text-xs text-gray-400">
-                                      驾驶员: {drivers.find(d => d.id === code.driverId)?.name || '未知驾驶员'}
+                                      驾驶员: {code.driver?.name || '未知驾驶员'}
                                     </div>
                                     <div className="text-xs text-gray-400">
                                       创建时间: {new Date(code.createdAt).toLocaleDateString()}
@@ -2073,7 +2078,7 @@ export default function Home() {
                 <h3 className="text-lg font-semibold text-gray-900"></h3>
                 {/* <p className="text-sm text-gray-500">为车辆 {vehicles.find(v => v.id === currentVehicleId)?.licensePlate} 管理代开驾驶员</p> */}
               </div>
-              <Dialog>
+              <Dialog open={isAddDriverDialogOpen} onOpenChange={setIsAddDriverDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => {
                     setDriverForm({
