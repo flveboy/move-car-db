@@ -14,7 +14,15 @@ export async function PATCH(
     if (!token) {
       return NextResponse.json(
         { error: '未提供认证令牌' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
     
@@ -22,7 +30,15 @@ export async function PATCH(
     if (!payload) {
       return NextResponse.json(
         { error: '无效的认证令牌' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -35,7 +51,15 @@ export async function PATCH(
     if (typeof isActive !== 'boolean') {
       return NextResponse.json(
         { error: 'isActive 参数必须是布尔值' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
     
@@ -50,7 +74,15 @@ export async function PATCH(
     if (!existingDriver) {
       return NextResponse.json(
         { error: '驾驶员不存在或不属于该车辆' },
-        { status: 404 }
+        { 
+          status: 404,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
     
@@ -63,13 +95,29 @@ export async function PATCH(
     return NextResponse.json({
       success: true,
       data: updatedDriver
+    }, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store'
+      }
     })
     
   } catch (error) {
     console.error('切换驾驶员状态错误:', error)
     return NextResponse.json(
       { error: '切换驾驶员状态失败' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
+        }
+      }
     )
   }
 }

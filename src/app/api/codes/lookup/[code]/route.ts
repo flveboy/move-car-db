@@ -11,7 +11,15 @@ export async function GET(
     if (!code) {
       return NextResponse.json(
         { error: '挪车码不能为空' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -32,7 +40,15 @@ export async function GET(
     if (!codeRecord) {
       return NextResponse.json(
         { error: '挪车码不存在' },
-        { status: 404 }
+        { 
+          status: 404,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -62,7 +78,15 @@ export async function GET(
     if (!vehicle) {
       return NextResponse.json(
         { error: '关联车辆不存在' },
-        { status: 404 }
+        { 
+          status: 404,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -76,7 +100,15 @@ export async function GET(
     if (!codeRecord.isActive) {
       return NextResponse.json(
         { error: '挪车码已失效' },
-        { status: 410 }
+        { 
+          status: 410,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -84,7 +116,15 @@ export async function GET(
     if (codeRecord.expiredAt && new Date() > codeRecord.expiredAt) {
       return NextResponse.json(
         { error: '挪车码已过期' },
-        { status: 410 }
+        { 
+          status: 410,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -92,7 +132,15 @@ export async function GET(
     if (driver && !driver.isActive) {
       return NextResponse.json(
         { error: '该驾驶员已被停用，无法使用挪车码' },
-        { status: 410 }
+        { 
+          status: 410,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
       )
     }
 
@@ -131,13 +179,35 @@ export async function GET(
           name: driver.name
         } : null
       }
+    }, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store',
+        'Last-Modified': new Date().toUTCString(),
+        'ETag': `"${Date.now()}-${Math.random()}"`,
+        'Vary': 'User-Agent',
+        // 微信浏览器特殊头部
+        'X-Accel-Expires': '0',
+        'X-Frame-Options': 'SAMEORIGIN'
+      }
     })
 
   } catch (error) {
     console.error('查询挪车码失败:', error)
     return NextResponse.json(
       { error: '服务器错误' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
+        }
+      }
     )
   }
 }

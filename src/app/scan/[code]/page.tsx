@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { fetchWithNoCache, clearPageCache, isWeChatBrowser } from '@/lib/wechat-cache'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -70,6 +71,9 @@ function ScanContent() {
 
   // 加载车辆信息和速率限制
   useEffect(() => {
+    // 清除页面缓存，特别针对微信浏览器
+    clearPageCache()
+    
     if (code) {
       loadVehicleInfo()
       loadRateLimit()
@@ -143,7 +147,10 @@ function ScanContent() {
       }
       
       console.log('正在加载挪车码:', code)
-      const response = await fetch(`/api/codes/lookup/${code}`)
+      console.log('微信浏览器检测:', isWeChatBrowser())
+      
+      // 使用专门的防缓存请求函数
+      const response = await fetchWithNoCache(`/api/codes/lookup/${code}`)
       console.log('API响应状态:', response.status)
       
       if (!response.ok) {

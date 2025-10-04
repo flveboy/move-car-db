@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { fetchWithNoCache, clearPageCache, isWeChatBrowser } from '@/lib/wechat-cache'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -53,6 +54,9 @@ function ScanResultContent({ code }: { code: string }) {
   })
 
   useEffect(() => {
+    // 清除页面缓存，特别针对微信浏览器
+    clearPageCache()
+    
     if (code) {
       fetchCodeInfo(code)
     } else {
@@ -76,7 +80,11 @@ function ScanResultContent({ code }: { code: string }) {
   const fetchCodeInfo = async (code: string) => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/codes/lookup/${code}`)
+      console.log('正在加载挪车码:', code)
+      console.log('微信浏览器检测:', isWeChatBrowser())
+      
+      // 使用专门的防缓存请求函数
+      const response = await fetchWithNoCache(`/api/codes/lookup/${code}`)
       
       if (response.ok) {
         const data = await response.json()
