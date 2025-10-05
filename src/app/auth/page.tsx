@@ -10,7 +10,8 @@ export default function AuthPage() {
   const router = useRouter()
 
   const handleAuthSuccess = () => {
-    router.push('/')
+    // 登录成功后的跳转已经在useAuth的login函数中处理了
+    // 这里不需要再做跳转
   }
 
   return (

@@ -16,7 +16,8 @@
     "deploy:cloudflare": "node deploy.js cloudflare",
     "deploy:all": "node deploy.js all",
     "deploy:check": "node deploy.js --check",
-    "create-admin": "node scripts/create-admin.js"
+    "create-admin": "node scripts/create-admin.js",
+    "init-system-config": "node scripts/init-system-config.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

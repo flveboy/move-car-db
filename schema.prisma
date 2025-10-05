@@ -113,3 +113,23 @@ model Record {
 
   @@map("records")
 }
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  type      ConfigType @default(BOOLEAN)
+  name      String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_configs")
+}
+
+enum ConfigType {
+  BOOLEAN
+  STRING
+  NUMBER
+  JSON
+}
