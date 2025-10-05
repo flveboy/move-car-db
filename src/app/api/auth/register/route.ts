@@ -18,6 +18,20 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // 检查是否开放注册
+    const allowRegistrationConfig = await db.systemConfig.findUnique({
+      where: { key: 'ALLOW_REGISTRATION' }
+    })
+    
+    const allowRegistration = allowRegistrationConfig?.value === 'true' || allowRegistrationConfig === null
+    
+    if (!allowRegistration) {
+      return NextResponse.json(
+        { error: '系统暂未开放注册，请联系管理员' },
+        { status: 403 }
+      )
+    }
+    
     const body = await request.json()
     
     // 验证输入

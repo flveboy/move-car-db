@@ -13,9 +13,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/hooks/use-toast'
 import { AuthGuard } from '@/components/auth/auth-guard'
 import { Header } from '@/components/layout/header'
-import { Plus, Search, Edit, Trash2, Key, UserCheck, UserX } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Key, UserCheck, UserX, Settings } from 'lucide-react'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
+import Link from 'next/link'
 
 interface User {
   id: string
@@ -279,10 +280,22 @@ export default function AdminPage() {
         
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">用户管理</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              管理系统用户，包括创建、编辑、删除用户等操作
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">用户管理</h1>
+                <p className="mt-1 text-sm text-gray-600">
+                  管理系统用户，包括创建、编辑、删除用户等操作
+                </p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link href="/admin/system-config">
+                  <Button variant="outline">
+                    <Settings className="mr-2 h-4 w-4" />
+                    系统配置
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* 搜索和过滤 */}
@@ -370,7 +383,7 @@ export default function AdminPage() {
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="搜索用户（手机号、姓名、邮箱）"
+                      placeholder="搜索用户（用户名、手机号、姓名、邮箱）"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"

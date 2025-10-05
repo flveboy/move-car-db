@@ -45,6 +45,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
       const result = await login(data.username, data.password)
       
       if (result.success) {
+        // 登录成功后的跳转已经在useAuth的login函数中处理了
         onSuccess?.()
       } else {
         setError(result.error || '登录失败')

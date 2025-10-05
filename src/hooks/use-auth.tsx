@@ -95,6 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(data.user)
           setToken(data.token)
           localStorage.setItem('auth_token', data.token)
+          
+          // 检查用户角色，如果是管理员则跳转到后台管理界面
+          if (data.user.role === 'ADMIN') {
+            router.replace('/admin')
+          } else {
+            router.push('/')
+          }
+          
           return { success: true }
         } else {
           // 处理用户不存在的情况

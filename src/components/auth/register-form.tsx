@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -38,6 +38,8 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   const { register: registerUser } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [allowRegistration, setAllowRegistration] = useState(true)
+  const [checkingConfig, setCheckingConfig] = useState(true)
 
   const {
     register,
@@ -46,6 +48,27 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema)
   })
+
+  // 检查是否允许注册
+  useEffect(() => {
+    const checkRegistrationConfig = async () => {
+      try {
+        const response = await fetch('/api/system-config/public?key=ALLOW_REGISTRATION')
+        if (response.ok) {
+          const config = await response.json()
+          setAllowRegistration(config.value === 'true')
+        }
+      } catch (error) {
+        console.error('检查注册配置失败:', error)
+        // 默认允许注册
+        setAllowRegistration(true)
+      } finally {
+        setCheckingConfig(false)
+      }
+    }
+
+    checkRegistrationConfig()
+  }, [])
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true)
@@ -71,6 +94,56 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // 如果正在检查配置，显示加载状态
+  if (checkingConfig) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="py-8">
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin mr-2" />
+            检查系统配置中...
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // 如果不允许注册，显示提示信息
+  if (!allowRegistration) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>用户注册</CardTitle>
+          <CardDescription>
+            系统注册状态
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert variant="destructive">
+            <AlertDescription>
+              系统暂未开放注册，请联系管理员获取账号。
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+        <CardFooter>
+          {onSwitchToLogin && (
+            <div className="w-full text-center text-sm">
+              已有账号？
+              <Button
+                type="button"
+                variant="link"
+                className="p-0 h-auto text-sm"
+                onClick={onSwitchToLogin}
+              >
+                立即登录
+              </Button>
+            </div>
+          )}
+        </CardFooter>
+      </Card>
+    )
   }
 
   return (
