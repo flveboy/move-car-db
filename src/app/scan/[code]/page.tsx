@@ -350,12 +350,28 @@ function ScanContent() {
                 {error}
               </AlertDescription>
             </Alert>
-            <Button 
-              onClick={() => router.push('/')}
-              className="w-full mt-4"
-            >
-              返回首页
-            </Button>
+            <div className="space-y-3 mt-4">
+              <Button 
+                onClick={() => window.location.reload()}
+                className="w-full"
+              >
+                刷新页面
+              </Button>
+              <Button 
+                onClick={() => {
+                  // 在微信浏览器中提供返回提示
+                  if (navigator.userAgent.toLowerCase().includes('micromessenger')) {
+                    alert('请点击左上角返回按钮或关闭页面')
+                  } else {
+                    window.close()
+                  }
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                退出页面
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

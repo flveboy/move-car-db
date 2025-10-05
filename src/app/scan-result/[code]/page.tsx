@@ -231,11 +231,30 @@ function ScanResultContent({ code }: { code: string }) {
           <CardContent className="p-6">
             <div className="text-center">
               <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">挪车码不存在</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">挪车码不存在或已停用</h2>
               <p className="text-gray-600 mb-4">请检查挪车码是否正确或联系车主</p>
-              <Button onClick={() => router.push('/')}>
-                返回首页
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => window.location.reload()}
+                  className="w-full"
+                >
+                  刷新页面
+                </Button>
+                <Button 
+                 onClick={() => {
+                  // 在微信浏览器中提供返回提示
+                  if (navigator.userAgent.toLowerCase().includes('micromessenger')) {
+                    alert('请点击左上角返回按钮或关闭页面')
+                  } else {
+                    window.close()
+                  }
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                退出页面
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

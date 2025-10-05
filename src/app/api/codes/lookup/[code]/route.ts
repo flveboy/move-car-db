@@ -131,7 +131,7 @@ export async function GET(
     // 如果是代开驾驶员的挪车码，检查驾驶员是否启用
     if (driver && !driver.isActive) {
       return NextResponse.json(
-        { error: '该驾驶员已被停用，无法使用挪车码' },
+        { error: '该挪车码已被停用' },
         { 
           status: 410,
           headers: {
