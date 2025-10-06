@@ -95,6 +95,14 @@ export default function Home() {
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('vehicles')
+  const [loading, setLoading] = useState({
+    vehicles: false,
+    codes: false,
+    records: false,
+    notification: false
+  })
+
+  
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [codes, setCodes] = useState<Code[]>([])
   const [records, setRecords] = useState<Record[]>([])
@@ -187,28 +195,66 @@ export default function Home() {
     messageType: 'text'
   })
 
-  // 保存通知测试配置到本地存储
-  const saveNotificationConfig = () => {
-    const config = {
-      dingtalk: dingtalkTestForm,
-      wechat: wechatTestForm
+  // 保存用户通知测试配置
+  const saveNotificationConfig = async () => {
+    try {
+      const config = {
+        dingtalkWebhook: dingtalkTestForm.webhook,
+        dingtalkSign: dingtalkTestForm.sign,
+        dingtalkKeyword: dingtalkTestForm.keyword,
+        dingtalkSecret: dingtalkTestForm.secret,
+        wechatWebhook: wechatTestForm.webhook,
+        wechatMessage: wechatTestForm.message,
+        wechatMessageType: wechatTestForm.messageType
+      }
+      
+      const response = await fetch('/api/user/notification-config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(config)
+      })
+
+      if (!response.ok) {
+        throw new Error('保存配置失败')
+      }
+    } catch (error) {
+      console.error('保存通知配置失败:', error)
     }
-    localStorage.setItem('notificationTestConfig', JSON.stringify(config))
   }
 
-  // 从本地存储加载通知测试配置
-  const loadNotificationConfig = () => {
+  // 加载用户通知测试配置(废弃了)
+  const loadNotificationConfig = async () => {
     try {
-      const savedConfig = localStorage.getItem('notificationTestConfig')
-      if (savedConfig) {
-        const config = JSON.parse(savedConfig)
-        if (config.dingtalk) {
-          setDingtalkTestForm(config.dingtalk)
+      const loadResponse = await fetch('/api/user/notification-config', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-        if (config.wechat) {
-          setWechatTestForm(config.wechat)
+      })
+      if (loadResponse.ok) {
+        const config = await loadResponse.json()
+        if (config.dingtalkWebhook) {
+          setDingtalkTestForm({
+            webhook: config.dingtalkWebhook || '',
+            sign: config.dingtalkSign || false,
+            keyword: config.dingtalkKeyword || '',
+            secret: config.dingtalkSecret || '',
+            message: dingtalkTestForm.message
+          })
+        }
+        if (config.wechatWebhook) {
+          setWechatTestForm({
+            webhook: config.wechatWebhook || '',
+            message: config.wechatMessage || wechatTestForm.message,
+            messageType: config.wechatMessageType || 'text'
+          })
         }
       }
+      
     } catch (error) {
       console.error('加载通知配置失败:', error)
     }
@@ -221,17 +267,20 @@ export default function Home() {
     }
   }, [user, authLoading, router])
 
-  // 组件挂载时加载通知配置
-  useEffect(() => {
-    loadNotificationConfig()
-  }, [])
 
   // 加载用户数据
+  // useEffect(() => {
+  //   if (user && token) {
+  //     loadUserData()
+  //   }
+  // }, [user, token])
+
+  // Tab切换时加载对应数据
   useEffect(() => {
     if (user && token) {
-      loadUserData()
+      fetchTabData(activeTab)
     }
-  }, [user, token])
+  }, [user , token , activeTab])
 
   // 搜索挪车码
   useEffect(() => {
@@ -283,7 +332,7 @@ export default function Home() {
         fetch('/api/codes', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('/api/records/owner/me', {
+        fetch('/api/records/owner/records', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ])
@@ -309,6 +358,80 @@ export default function Home() {
       setIsLoading(false)
     }
   }
+
+  // 数据加载函数
+  const fetchTabData = async (tab: string) => {
+    if (!tab) return
+    
+    const apiMap = {
+      'vehicles': '/api/vehicles',
+      'codes': '/api/codes', 
+      'records': '/api/records/owner/records',
+      'notification-test': '/api/user/notification-config'
+    }
+    
+    setLoading(prev => ({...prev, [tab]: true}))
+    try {
+      if (!token) {
+        throw new Error('未登录')
+      }
+
+      const res = await fetch(apiMap[tab as keyof typeof apiMap], {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (res.status === 401) {
+        throw new Error('用户认证失败')
+      }
+      
+      if (!res.ok) {
+        throw new Error(`请求失败: ${res.status}`)
+      }
+      
+      const data = await res.json()
+      
+      switch(tab) {
+        case 'vehicles':
+          setVehicles(data.data || [])
+          break
+        case 'codes':
+          setCodes(data.data || [])
+          break
+        case 'records':
+          setRecords(data.data || [])
+          break
+        case 'notification-test':
+          if (data.dingtalkWebhook) {
+            setDingtalkTestForm({
+              webhook: data.dingtalkWebhook || '',
+              sign: data.dingtalkSign || false,
+              keyword: data.dingtalkKeyword || '',
+              secret: data.dingtalkSecret || '',
+              message: dingtalkTestForm.message
+            })
+          }
+          if (data.wechatWebhook) {
+            setWechatTestForm({
+              webhook: data.wechatWebhook || '',
+              message: data.wechatMessage || wechatTestForm.message,
+              messageType: data.wechatMessageType || 'text'
+            })
+          }
+          break
+      }
+    } catch (error) {
+      console.error(`Error fetching ${tab} data:`, error)
+      if (error instanceof Error && error.message === '用户认证失败') {
+        // 可以在这里添加重定向到登录页的逻辑
+        console.log('认证失败，请重新登录')
+      }
+    } finally {
+      setLoading(prev => ({...prev, [tab]: false}))
+    }
+  }
+
 
   const handleAddVehicle = async (e: React.FormEvent) => {
     e.preventDefault()

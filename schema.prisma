@@ -29,6 +29,7 @@ model Owner {
   vehicles Vehicle[]
   codes    Code[]
   records  Record[]
+  notificationConfigs NotificationConfig[] @relation("OwnerToNotificationConfig")
 
   @@map("owners")
 }
@@ -132,4 +133,22 @@ enum ConfigType {
   STRING
   NUMBER
   JSON
+}
+
+model NotificationConfig {
+  id        String   @id @default(cuid())
+  ownerId   String
+  @@unique([ownerId]) 
+  dingtalkWebhook String?
+  dingtalkSign    Boolean  @default(false)
+  dingtalkKeyword String?
+  dingtalkSecret  String?
+  wechatWebhook   String?
+  wechatMessage   String?
+  wechatMessageType String? @default("text")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner Owner @relation("OwnerToNotificationConfig", fields: [ownerId], references: [id], onDelete: Cascade)
+  @@map("notification_configs")
 }
