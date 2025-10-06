@@ -1682,9 +1682,19 @@ export default function Home() {
                     </CardHeader>
                     <CardContent>
                       <Tabs value={codesTab} onValueChange={setCodesTab} className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 mb-4">
-                          <TabsTrigger value="owner">我的挪车码</TabsTrigger>
-                          <TabsTrigger value="driver">代开驾驶员挪车码</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-100 p-1 rounded-lg">
+                          <TabsTrigger 
+                            value="owner"
+                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600"
+                          >
+                            我的挪车码
+                          </TabsTrigger>
+                          <TabsTrigger 
+                            value="driver"
+                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600"
+                          >
+                            代开驾驶员挪车码
+                          </TabsTrigger>
                         </TabsList>
                         
                         <TabsContent value="owner" className="space-y-4">
