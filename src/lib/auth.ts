@@ -39,7 +39,7 @@ export function generateToken(user: Owner): string {
     role: user.role
   }
   
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' }) // 修改为2小时有效期
 }
 
 // 验证 JWT Token
