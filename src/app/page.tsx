@@ -343,11 +343,19 @@ export default function Home() {
         setIsAddDialogOpen(false)
       } else {
         const error = await response.json()
-        alert(error.error || '添加车辆失败')
+        toast({
+          title: "添加车辆失败",
+          description: error.error || '请稍后重试',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('添加车辆失败:', error)
-      alert('网络错误，请稍后重试')
+      toast({
+        title: "网络错误",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -398,11 +406,19 @@ export default function Home() {
         setEditingVehicle(null)
       } else {
         const error = await response.json()
-        alert(error.error || '编辑车辆失败')
+        toast({
+          title: "编辑车辆失败",
+          description: error.error || '请稍后重试',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('编辑车辆失败:', error)
-      alert('网络错误，请稍后重试')
+      toast({
+        title: "网络错误",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -436,11 +452,19 @@ export default function Home() {
         setVehicleToDelete(null)
       } else {
         const error = await response.json()
-        alert(error.error || '删除车辆失败')
+        toast({
+          title: "删除车辆失败",
+          description: error.error || '请稍后重试',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('删除车辆失败:', error)
-      alert('网络错误，请稍后重试')
+      toast({
+        title: "网络错误",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -466,11 +490,19 @@ export default function Home() {
         setCodeToDelete(null)
       } else {
         const error = await response.json()
-        alert(error.error || '删除挪车码失败')
+        toast({
+          title: "删除挪车码失败",
+          description: error.error || '请稍后重试',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('删除挪车码失败:', error)
-      alert('网络错误，请稍后重试')
+      toast({
+        title: "网络错误",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -520,12 +552,20 @@ export default function Home() {
           setSearchTerm('')
         } else {
           const error = await response.json()
-          alert(error.error || '生成挪车码失败')
+          toast({
+            title: "生成挪车码失败",
+            description: error.error || '请稍后重试',
+            variant: "destructive"
+          })
         }
       }
     } catch (error) {
       console.error('处理挪车码失败:', error)
-      alert('网络错误，请稍后重试')
+      toast({
+        title: "网络错误",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -549,11 +589,19 @@ export default function Home() {
         ))
       } else {
         const error = await response.json()
-        alert(error.error || '切换状态失败')
+        toast({
+          title: "切换状态失败",
+          description: error.error || '请稍后重试',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('切换状态失败:', error)
-      alert('网络错误，请稍后重试')
+      toast({
+        title: "网络错误",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -592,13 +640,20 @@ export default function Home() {
           // Clean up
           URL.revokeObjectURL(url)
           
-          alert('二维码已下载')
+          toast({
+            title: "二维码已下载",
+            variant: "default"
+          })
         }
       }, 'image/png')
       
     } catch (error) {
       console.error('生成二维码失败:', error)
-      alert('生成二维码失败，请稍后重试')
+      toast({
+        title: "生成二维码失败",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -607,7 +662,10 @@ export default function Home() {
   // 钉钉通知测试函数
   const handleTestDingTalkNotification = async () => {
     if (!dingtalkTestForm.webhook.trim()) {
-      alert('请输入钉钉webhook地址')
+      toast({
+        title: "请输入钉钉webhook地址",
+        variant: "destructive"
+      })
       return
     }
 
@@ -633,13 +691,24 @@ export default function Home() {
       
       if (result.success) {
         saveNotificationConfig() // 保存配置
-        alert(result.message)
+        toast({
+          title: result.message,
+          variant: "default"
+        })
       } else {
-        alert(`钉钉通知发送失败：${result.error || '未知错误'}`)
+        toast({
+          title: "钉钉通知发送失败",
+          description: result.error || '未知错误',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('钉钉通知测试失败:', error)
-      alert('钉钉通知测试失败，请检查网络连接和配置')
+      toast({
+        title: "钉钉通知测试失败",
+        description: "请检查网络连接和配置",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -648,7 +717,10 @@ export default function Home() {
   // 添加驾驶员函数
   const handleAddDriver = async () => {
     if (!driverForm.name.trim() || !driverForm.phone.trim()) {
-      alert('请填写驾驶员姓名和手机号')
+      toast({
+        title: "请填写驾驶员姓名和手机号",
+        variant: "destructive"
+      })
       return
     }
 
@@ -687,11 +759,19 @@ export default function Home() {
         setIsAddDriverDialogOpen(false)
         setIsDriverDialogOpen(true)
       } else {
-        alert(`添加驾驶员失败：${result.error || '未知错误'}`)
+        toast({
+          title: "添加驾驶员失败",
+          description: result.error || '未知错误',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('添加驾驶员失败:', error)
-      alert('添加驾驶员失败，请检查网络连接')
+      toast({
+        title: "添加驾驶员失败",
+        description: "请检查网络连接",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -866,11 +946,19 @@ export default function Home() {
           description: `${result.data.name || '驾驶员'} 已${isActive ? '启用' : '停用'}`,
         })
       } else {
-        alert(`切换驾驶员状态失败：${result.error || '未知错误'}`)
+        toast({
+          title: "切换驾驶员状态失败",
+          description: result.error || '未知错误',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('切换驾驶员状态失败:', error)
-      alert('切换驾驶员状态失败，请检查网络连接')
+      toast({
+        title: "切换驾驶员状态失败",
+        description: "请检查网络连接",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -985,7 +1073,10 @@ export default function Home() {
   // 企微通知测试函数
   const handleTestWechatNotification = async () => {
     if (!wechatTestForm.webhook.trim()) {
-      alert('请输入企业微信webhook地址')
+      toast({
+        title: "请输入企业微信webhook地址",
+        variant: "destructive"
+      })
       return
     }
 
@@ -1009,13 +1100,24 @@ export default function Home() {
       
       if (result.success) {
         saveNotificationConfig() // 保存配置
-        alert(result.message)
+        toast({
+          title: result.message,
+          variant: "default"
+        })
       } else {
-        alert(`企业微信通知发送失败：${result.error || '未知错误'}`)
+        toast({
+          title: "企业微信通知发送失败",
+          description: result.error || '未知错误',
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('企业微信通知测试失败:', error)
-      alert('企业微信通知测试失败，请检查网络连接和配置')
+      toast({
+        title: "企业微信通知测试失败",
+        description: "请检查网络连接和配置",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }

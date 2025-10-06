@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Car, MessageCircle, Phone, Bell, Send, X, AlertTriangle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { toast } from '@/hooks/use-toast'
 
 interface VehicleInfo {
   id: string
@@ -37,6 +38,7 @@ interface RateLimitInfo {
 }
 
 function ScanContent() {
+
   const router = useRouter()
   const params = useParams()
   const code = params.code as string
@@ -361,7 +363,12 @@ function ScanContent() {
                 onClick={() => {
                   // 在微信浏览器中提供返回提示
                   if (navigator.userAgent.toLowerCase().includes('micromessenger')) {
-                    alert('请点击左上角返回按钮或关闭页面')
+                    toast({
+                      title: "微信浏览器提示",
+                      description: "请点击左上角返回按钮或关闭页面",
+                      variant: "default",
+                      className: "bg-blue-50 text-blue-800 border-blue-200"
+                    })
                   } else {
                     window.close()
                   }
