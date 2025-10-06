@@ -15,11 +15,13 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">扫码挪车</h1>
-          <p className="mt-2 text-gray-600">智能停车管理系统</p>
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            扫码挪车
+          </h1>
+          <p className="mt-3 text-lg text-gray-500">智能停车管理系统</p>
         </div>
         
         {isLogin ? (
