@@ -4,13 +4,43 @@ export const setupSocket = (io: Server) => {
   io.on('connection', (socket) => {
     console.log('Client connected:', socket.id);
     
-    // Handle messages
-    socket.on('message', (msg: { text: string; senderId: string }) => {
-      // Echo: broadcast message only the client who send the message
-      socket.emit('message', {
-        text: `Echo: ${msg.text}`,
-        senderId: 'system',
-        timestamp: new Date().toISOString(),
+    // 加入扫码房间
+    socket.on('join_room', (data: { roomId: string }) => {
+      socket.join(data.roomId);
+      console.log(`Client ${socket.id} joined room: ${data.roomId}`);
+      
+      // 发送确认消息
+      socket.emit('room_joined', {
+        roomId: data.roomId,
+        message: `成功加入房间: ${data.roomId}`
+      });
+    });
+
+    // 离开扫码房间
+    socket.on('leave_room', (data: { roomId: string }) => {
+      socket.leave(data.roomId);
+      console.log(`Client ${socket.id} left room: ${data.roomId}`);
+    });
+
+    // 推送回复消息到扫码房间
+    socket.on('push_reply_message', (data: {
+      roomId: string;
+      message: string;
+      senderName: string;
+      senderRole: string;
+      timestamp: string;
+      recordId: string;
+    }) => {
+      console.log(`推送回复消息到房间 ${data.roomId}:`, data.message);
+      
+      // 广播消息到房间内的所有客户端
+      io.to(data.roomId).emit('reply_message', {
+        id: Date.now().toString(),
+        message: data.message,
+        senderName: data.senderName,
+        senderRole: data.senderRole,
+        timestamp: data.timestamp,
+        recordId: data.recordId
       });
     });
 
@@ -21,7 +51,7 @@ export const setupSocket = (io: Server) => {
 
     // Send welcome message
     socket.emit('message', {
-      text: 'Welcome to WebSocket Echo Server!',
+      text: '欢迎使用挪车系统WebSocket服务',
       senderId: 'system',
       timestamp: new Date().toISOString(),
     });

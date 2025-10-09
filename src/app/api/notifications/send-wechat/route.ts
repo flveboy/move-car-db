@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       }, { status: 429 })
     }
 
-    // 获取车辆信息和关联的挪车码
+    // 获取车辆信息和关联的挪车码，同时获取最近的扫描记录以获取sessionId
     const vehicleWithCode = await db.vehicle.findUnique({
       where: { id: vehicleId },
       include: {
@@ -51,6 +51,18 @@ export async function POST(request: NextRequest) {
                 name: true,
                 phone: true,
                 wechatWebhook: true
+              }
+            },
+            records: {
+              where: {
+                message: 'QR码扫描'
+              },
+              orderBy: {
+                createdAt: 'desc'
+              },
+              take: 1,
+              select: {
+                sessionId: true
               }
             }
           }
@@ -129,12 +141,19 @@ export async function POST(request: NextRequest) {
       
       if (result.errcode === 0) {
         // 先返回成功响应，然后异步记录日志
+        // 获取扫码时的sessionId
+        const scanSessionId = codeRecord.records && codeRecord.records.length > 0 
+          ? codeRecord.records[0].sessionId 
+          : null
+        
         const recordData = codeRecord ? {
           codeId: codeRecord.id,
           ownerId: vehicleWithCode.owner.id,
+          driverId: codeRecord.driverId, // 使用扫码时的driverId
           ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
           userAgent: request.headers.get('user-agent') || 'unknown',
-          message: `企微通知: ${message}`
+          message: `企微通知: ${message}`,
+          sessionId: scanSessionId // 使用扫码时的sessionId
         } : null
 
         // 异步记录日志，不阻塞响应

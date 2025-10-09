@@ -17,7 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { Header } from '@/components/layout/header'
-import { Car, QrCode, History, Plus, Trash2, Power, Download, Share2, Loader2, Edit, Users, Save } from 'lucide-react'
+import { Car, QrCode, History, Plus, Trash2, Power, Download, Share2, Loader2, Edit, Users, Save, MessageCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface Driver {
@@ -76,6 +76,17 @@ interface Code {
   }
 }
 
+interface Reply {
+  id: string
+  message: string
+  senderType: string
+  createdAt: string
+  sender: {
+    name: string
+    role: string
+  }
+}
+
 interface Record {
   id: string
   codeId: string
@@ -88,6 +99,7 @@ interface Record {
       licensePlate: string
     }
   }
+  replies?: Reply[]
 }
 
 export default function Home() {
@@ -122,6 +134,12 @@ export default function Home() {
   })
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  // 回复功能状态
+  const [replyDialogOpen, setReplyDialogOpen] = useState(false)
+  const [replyMessage, setReplyMessage] = useState('')
+  const [isReplying, setIsReplying] = useState(false)
+  const [selectedScanRecord, setSelectedScanRecord] = useState<any>(null)
 
   // 搜索状态
   const [searchTerm, setSearchTerm] = useState('')
@@ -400,7 +418,35 @@ export default function Home() {
           setCodes(data.data || [])
           break
         case 'records':
-          setRecords(data.data || [])
+          // 获取记录后，为每个记录获取回复列表
+          const recordsWithReplies = await Promise.all(
+            (data.data || []).map(async (record: any) => {
+              try {
+                const repliesResponse = await fetch(`/api/records/${record.id}/replies`, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                
+                if (repliesResponse.ok) {
+                  const repliesData = await repliesResponse.json();
+                  return {
+                    ...record,
+                    replies: repliesData.data?.replies || []
+                  };
+                }
+              } catch (error) {
+                console.error(`获取记录 ${record.id} 的回复失败:`, error);
+              }
+              
+              return {
+                ...record,
+                replies: []
+              };
+            })
+          );
+          
+          setRecords(recordsWithReplies || [])
           break
         case 'notification-test':
           if (data.dingtalkWebhook) {
@@ -1260,6 +1306,58 @@ export default function Home() {
     return null // 会自动重定向到登录页面
   }
 
+  // 回复扫码记录函数
+  const handleSendReply = async () => {
+    if (!replyMessage.trim() || !selectedScanRecord) return;
+
+    setIsReplying(true);
+    try {
+      const response = await fetch(`/api/records/${selectedScanRecord.id}/replies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: replyMessage.trim()
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // 发送成功后关闭对话框并清空消息
+        setReplyDialogOpen(false);
+        setReplyMessage('');
+        
+        toast({
+          title: "回复发送成功",
+          description: result.message,
+          variant: "default"
+        });
+        
+        // 刷新记录列表以显示新回复
+        fetchTabData('records');
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "回复发送失败",
+          description: errorData.error || '请稍后重试',
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('发送回复失败:', error);
+      toast({
+        title: "网络错误",
+        description: "请检查网络连接",
+        variant: "destructive"
+      });
+    } finally {
+      setIsReplying(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <Header />
@@ -2042,26 +2140,67 @@ export default function Home() {
                       ) : (
                         <div className="space-y-4">
                           {records.map((record) => (
-                            <div key={record.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div>
-                                <div className="font-medium text-gray-900">{record.code.code}</div>
-                                <div className="text-sm text-gray-500">
-                                  车辆: {record.code.vehicle.licensePlate}
-                                </div>
-                                <div className="text-xs text-gray-400">
-                                  扫描时间: {new Date(record.scanTime).toLocaleString()}
-                                </div>
-                                {record.ipAddress && (
+                            <div key={record.id} className="p-4 bg-gray-50 rounded-lg">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <div className="font-medium text-gray-900">{record.code.code}</div>
+                                  <div className="text-sm text-gray-500">
+                                    车辆: {record.code.vehicle.licensePlate}
+                                  </div>
                                   <div className="text-xs text-gray-400">
-                                    IP地址: {record.ipAddress}
+                                    扫描时间: {new Date(record.scanTime).toLocaleString()}
                                   </div>
-                                )}
-                                {record.message && (
-                                  <div className="text-sm text-gray-600 mt-1">
-                                    留言: {record.message}
-                                  </div>
-                                )}
+                                  {record.ipAddress && (
+                                    <div className="text-xs text-gray-400">
+                                      IP地址: {record.ipAddress}
+                                    </div>
+                                  )}
+                                </div>
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedScanRecord(record)
+                                    setReplyDialogOpen(true)
+                                  }}
+                                  disabled={isLoading}
+                                >
+                                  <MessageCircle className="h-4 w-4 mr-1" />
+                                  回复
+                                </Button>
                               </div>
+                              
+                              {record.message && (
+                                <div className="text-sm text-gray-600 mb-3 p-2 bg-white rounded border">
+                                  <strong>扫码者留言:</strong> {record.message}
+                                </div>
+                              )}
+                              
+                              {/* 回复列表显示 */}
+                              {record.replies && record.replies.length > 0 && (
+                                <div className="space-y-2">
+                                  <div className="text-xs text-gray-500 font-medium">回复记录:</div>
+                                  <div className="space-y-1">
+                                    {record.replies.map((reply) => (
+                                      <div key={reply.id} className="text-xs p-2 bg-white rounded border">
+                                        <div className="flex justify-between items-start mb-1">
+                                          <span className="font-medium text-gray-700">
+                                            {reply.sender.name} ({reply.sender.role === 'ADMIN' ? '管理员' : '用户'})
+                                          </span>
+                                          <span className="text-gray-400 text-xs">
+                                            {new Date(reply.createdAt).toLocaleString()}
+                                          </span>
+                                        </div>
+                                        <div className="text-gray-600">{reply.message}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {(!record.replies || record.replies.length === 0) && (
+                                <div className="text-xs text-gray-400 italic">
+                                  暂无回复
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -2647,6 +2786,57 @@ export default function Home() {
             {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Save className="h-4 w-4 mr-2" />}
             更新驾驶员信息
           </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* 回复对话框 */}
+      <Dialog open={replyDialogOpen} onOpenChange={setReplyDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>回复扫码记录</DialogTitle>
+            <DialogDescription>
+              请输入回复内容
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="replyMessage" className="text-sm font-medium text-gray-700">
+                回复内容
+              </Label>
+              <textarea
+                id="replyMessage"
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                placeholder="请输入回复内容..."
+                className="w-full h-24 p-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 transition-all duration-300 resize-none"
+              />
+            </div>
+
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setReplyDialogOpen(false)}
+                className="flex-1"
+              >
+                取消
+              </Button>
+              <Button 
+                onClick={handleSendReply}
+                disabled={isReplying || !replyMessage.trim()}
+                className="flex-1 bg-blue-500 hover:bg-blue-600"
+              >
+                {isReplying ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                    发送中...
+                  </div>
+                ) : (
+                  "发送回复"
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -145,14 +145,25 @@ export async function GET(
       )
     }
 
-    // 记录扫描
-    await db.record.create({
+    // 获取客户端IP地址
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown_ip'
+    
+    // 使用IP地址和codeId组合生成唯一的会话ID
+    // 这样不同IP的用户扫描同一个二维码会有不同的sessionId
+    const sessionId = `session_${codeRecord.id}_${ipAddress.replace(/[^a-zA-Z0-9]/g, '_')}`
+    
+    // 记录扫描，包含会话ID
+    const record = await db.record.create({
       data: {
         codeId: codeRecord.id,
         ownerId: codeRecord.ownerId,
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        ipAddress: ipAddress,
         userAgent: request.headers.get('user-agent') || 'unknown',
-        message: 'QR码扫描'
+        message: 'QR码扫描',
+        sessionId: sessionId,
+        ...(codeRecord.driverId && { driverId: codeRecord.driverId })
       }
     })
 
@@ -178,7 +189,9 @@ export async function GET(
         driver: driver ? {
           phone: driver.phone,
           name: driver.name
-        } : null
+        } : null,
+        sessionId: sessionId,
+        recordId: record.id
       }
     }, {
       status: 200,

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
+import type { Socket } from 'socket.io-client'
 import { useRouter, useParams } from 'next/navigation'
 import { fetchWithNoCache, clearPageCache, isWeChatBrowser } from '@/lib/wechat-cache'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Car, MessageCircle, Phone, Bell, Send, X, AlertTriangle } from 'lucide-react'
+import { Car, MessageCircle, Phone, Bell, Send, X, AlertTriangle, User } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { toast } from '@/hooks/use-toast'
 
@@ -35,6 +36,15 @@ interface RateLimitInfo {
   dingtalkCount: number
   wechatCount: number
   resetTime: number
+}
+
+interface ReplyMessage {
+  id: string
+  message: string
+  senderName: string
+  senderRole: string
+  timestamp: string
+  recordId: string
 }
 
 function ScanContent() {
@@ -62,6 +72,11 @@ function ScanContent() {
   const [wechatBlocked, setWechatBlocked] = useState(false)
   const [dingtalkCountdown, setDingtalkCountdown] = useState(0)
   const [wechatCountdown, setWechatCountdown] = useState(0)
+  const [socket, setSocket] = useState<Socket | null>(null)
+  const [replyMessages, setReplyMessages] = useState<ReplyMessage[]>([])
+  const [isConnected, setIsConnected] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [hasLoaded, setHasLoaded] = useState(false)
 
   // 消息模板
   const messageTemplates = {
@@ -76,13 +91,88 @@ function ScanContent() {
     // 清除页面缓存，特别针对微信浏览器
     clearPageCache()
     
-    if (code) {
+    if (code && !hasLoaded) {
+      setHasLoaded(true)
       loadVehicleInfo()
       loadRateLimit()
       // 设置默认消息
       setMessage(messageTemplates.default)
     }
-  }, [code])
+  }, [code, hasLoaded])
+
+  // WebSocket连接effect
+  useEffect(() => {
+    console.log('WebSocket effect触发，sessionId:', sessionId)
+    if (!sessionId) {
+      console.log('sessionId为空，跳过WebSocket连接')
+      return
+    }
+
+    let socket: any = null
+
+    // 动态导入Socket.IO客户端
+    import('socket.io-client').then(({ io }) => {
+      // 创建Socket.IO连接
+      socket = io({
+        path: '/api/socketio'
+      })
+      
+      socket.on('connect', () => {
+        console.log('Socket.IO连接成功，sessionId:', sessionId)
+        setIsConnected(true)
+        
+        // 加入会话房间（使用会话ID而不是二维码）
+        const roomId = `session_${sessionId}`
+        console.log('加入房间:', roomId)
+        socket.emit('join_room', {
+          roomId: roomId
+        })
+      })
+
+      socket.on('reply_message', (data) => {
+        // 收到回复消息
+        const newMessage: ReplyMessage = {
+          id: data.id,
+          message: data.message,
+          senderName: data.senderName,
+          senderRole: data.senderRole,
+          timestamp: data.timestamp,
+          recordId: data.recordId
+        }
+        
+        setReplyMessages(prev => [...prev, newMessage])
+        
+        // 显示通知
+        toast({
+          title: "收到新回复",
+          description: `${data.senderName}回复了您的挪车请求`,
+          variant: "default"
+        })
+      })
+
+      socket.on('room_joined', (data) => {
+        console.log('成功加入房间:', data.roomId)
+      })
+
+      socket.on('disconnect', () => {
+        console.log('Socket.IO连接断开')
+        setIsConnected(false)
+      })
+
+      // 保存socket实例以便清理
+      setSocket(socket)
+    }).catch(error => {
+      console.error('Socket.IO客户端加载失败:', error)
+      setIsConnected(false)
+    })
+
+    // 清理函数
+    return () => {
+      if (socket) {
+        socket.disconnect()
+      }
+    }
+  }, [sessionId])
 
   // 钉钉倒计时effect
   useEffect(() => {
@@ -171,6 +261,14 @@ function ScanContent() {
       }
 
       setVehicleInfo(result.data.vehicle)
+      
+      // 设置会话ID
+      if (result.data.sessionId) {
+        console.log('设置sessionId:', result.data.sessionId)
+        setSessionId(result.data.sessionId)
+      } else {
+        console.log('API响应中没有sessionId')
+      }
       
       // 设置驾驶员信息
       if (result.data.driver) {
@@ -574,6 +672,63 @@ function ScanContent() {
                     </TabsList>
                   </Tabs>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 回复消息显示 */}
+          <Card className="mb-2 bg-white/80 backdrop-blur-sm shadow-xl border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base text-gray-800 flex items-center justify-between">
+                <div className="flex items-center">
+                  <User className="h-4 w-4 mr-2 text-purple-500" />
+                  回复消息
+                  {isConnected && (
+                    <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800 text-xs">
+                      在线
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {replyMessages.length} 条消息
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {replyMessages.length === 0 ? (
+                  <div className="text-center py-4 text-gray-400 text-sm">
+                    {isConnected ? '暂无回复消息' : '连接中...'}
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {replyMessages.map((msg) => (
+                      <div key={msg.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex justify-between items-start mb-1">
+                          <div className="flex items-center">
+                            <span className="font-medium text-gray-700 text-sm">
+                              {msg.senderName}
+                            </span>
+                            <Badge 
+                              variant="secondary" 
+                              className="ml-2 text-xs"
+                              style={{
+                                backgroundColor: msg.senderRole === 'ADMIN' ? '#e0f2fe' : '#f0f9ff',
+                                color: msg.senderRole === 'ADMIN' ? '#0369a1' : '#0c4a6e'
+                              }}
+                            >
+                              {msg.senderRole === 'ADMIN' ? '管理员' : '用户'}
+                            </Badge>
+                          </div>
+                          <span className="text-xs text-gray-400">
+                            {new Date(msg.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">{msg.message}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

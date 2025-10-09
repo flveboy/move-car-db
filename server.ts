@@ -48,6 +48,9 @@ async function createCustomServer() {
       }
     });
 
+    // 将Socket.IO实例设置为全局变量，以便API路由可以访问
+    (global as any).io = io;
+
     setupSocket(io);
 
     // Start the server
