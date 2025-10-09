@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     // 转换为中国时区 (UTC+8)
     const chinaTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000))
     const notificationTime = `${chinaTime.getFullYear()}-${String(chinaTime.getMonth() + 1).padStart(2, '0')}-${String(chinaTime.getDate()).padStart(2, '0')} ${String(chinaTime.getHours()).padStart(2, '0')}:${String(chinaTime.getMinutes()).padStart(2, '0')}:${String(chinaTime.getSeconds()).padStart(2, '0')}`
-    const messageContent = `【挪车通知】\n\n尊敬的${contactName}，您的车辆 ${licensePlate} 需要移车。\n\n通知内容：${message}\n\n通知时间：${notificationTime}\n\n联系电话：${contactPhone}\n\n请尽快处理，谢谢！`
+    const messageContent = `【挪车通知】\n\n尊敬的${contactName}，您的车辆 ${licensePlate} 需要移车。\n\n通知内容：${message}\n\n通知时间：${notificationTime}\n\n请尽快处理，谢谢！`
 
     const payload = {
       msgtype: 'text',
@@ -180,16 +180,21 @@ export async function POST(request: NextRequest) {
       const result = await response.json()
       
       if (result.errcode === 0) {
-        // 记录成功的通知
-        if (codeRecord) {
-          await db.record.create({
-            data: {
-              codeId: codeRecord.id,
-              ownerId: vehicleWithCode.ownerId,
-              ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
-              userAgent: request.headers.get('user-agent') || 'unknown',
-              message: `钉钉通知: ${message}`
-            }
+        // 先返回成功响应，然后异步记录日志
+        const recordData = codeRecord ? {
+          codeId: codeRecord.id,
+          ownerId: vehicleWithCode.ownerId,
+          ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown',
+          message: `钉钉通知: ${message}`
+        } : null
+
+        // 异步记录日志，不阻塞响应
+        if (recordData) {
+          db.record.create({
+            data: recordData
+          }).catch(error => {
+            console.error('记录通知日志失败:', error)
           })
         }
 
