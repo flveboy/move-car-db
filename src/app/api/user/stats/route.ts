@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { optimizedUserQueries } from '@/lib/optimized-queries'
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,20 +27,8 @@ export async function GET(request: NextRequest) {
     // 获取用户ID
     const userId = payload.userId
     
-    // 获取车辆数量
-    const vehicleCount = await db.vehicle.count({
-      where: { ownerId: userId }
-    })
-    
-    // 获取挪车码数量
-    const codeCount = await db.code.count({
-      where: { ownerId: userId }
-    })
-    
-    // 获取通知记录数量
-    const notificationCount = await db.record.count({
-      where: { ownerId: userId }
-    })
+    // 使用优化的统计查询
+    const { vehicleCount, codeCount, notificationCount } = await optimizedUserQueries.getUserStats(userId)
     
     return NextResponse.json({
       stats: {

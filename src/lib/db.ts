@@ -10,23 +10,45 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// 带重试机制的数据库连接
+// 带重试机制和性能优化的数据库连接
 const createPrismaClient = () => {
   const prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
     datasources: {
       db: {
         url: process.env.DATABASE_URL
       }
+    },
+    // 事务配置优化
+    transactionOptions: {
+      maxWait: 5000,
+      timeout: 10000,
     }
-  }) as any
+  })
 
-  // 添加连接检查中间件
+  // 添加性能监控和优化中间件
   prisma.$use = async (params: any, next: (params: any) => Promise<any>) => {
+    const start = Date.now()
     try {
-      return await next(params)
+      const result = await next(params)
+      const duration = Date.now() - start
+      
+      // 记录慢查询
+      if (duration > 1000) {
+        console.warn(`慢查询检测 (${duration}ms):`, {
+          model: params.model,
+          action: params.action,
+          duration
+        })
+      }
+      
+      return result
     } catch (error) {
-      console.error('数据库操作错误:', error)
+      console.error('数据库操作错误:', {
+        model: params.model,
+        action: params.action,
+        error: error instanceof Error ? error.message : String(error)
+      })
       throw error
     }
   }

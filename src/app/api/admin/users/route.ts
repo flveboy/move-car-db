@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { authMiddleware } from '@/lib/middleware'
 import { isAdmin } from '@/lib/auth'
+import { optimizedUserQueries } from '@/lib/optimized-queries'
 import { z } from 'zod'
 
 // 用户创建验证 schema
@@ -56,34 +57,8 @@ export async function GET(request: NextRequest) {
       where.role = role
     }
     
-    // 获取用户列表
-    const [users, total] = await Promise.all([
-      db.owner.findMany({
-        where,
-        select: {
-          id: true,
-          username: true,
-          phone: true,
-          name: true,
-          email: true,
-          role: true,
-          isActive: true,
-          createdAt: true,
-          lastLogin: true,
-          _count: {
-            select: {
-              vehicles: true,
-              codes: true,
-              records: true
-            }
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit
-      }),
-      db.owner.count({ where })
-    ])
+    // 使用优化的用户查询
+    const { users, total } = await optimizedUserQueries.getUsersPaginated(page, limit, search)
     
     return NextResponse.json({
       users,

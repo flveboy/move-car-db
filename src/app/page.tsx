@@ -813,7 +813,7 @@ export default function Home() {
       const result = await response.json()
       
       if (result.success) {
-        saveNotificationConfig() // 保存配置
+        // saveNotificationConfig() // 保存配置
         toast({
           title: result.message,
           variant: "default"
@@ -1222,7 +1222,7 @@ export default function Home() {
       const result = await response.json()
       
       if (result.success) {
-        saveNotificationConfig() // 保存配置
+        // saveNotificationConfig() // 保存配置
         toast({
           title: result.message,
           variant: "default"

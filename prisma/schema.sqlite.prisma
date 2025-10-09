@@ -1,0 +1,145 @@
+// SQLite 本地开发配置
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Owner {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  phone     String    @unique
+  name      String
+  email     String?
+  password  String
+  role      Role      @default(USER)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  lastLogin DateTime?
+
+  vehicles Vehicle[]
+  codes    Code[]
+  records  Record[]
+  notificationConfigs NotificationConfig[]
+
+  @@map("owners")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Vehicle {
+  id              String   @id @default(cuid())
+  ownerId         String
+  licensePlate    String   @unique
+  brand           String?
+  model           String?
+  color           String?
+  dingtalkWebhook String?
+  dingtalkSign    Boolean  @default(false)
+  dingtalkKeyword String?
+  dingtalkSecret  String?
+  wechatWebhook   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  owner   Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  codes   Code[]
+  drivers Driver[]
+}
+
+model Driver {
+  id              String   @id @default(cuid())
+  vehicleId       String
+  name            String
+  phone           String
+  isActive        Boolean  @default(true)
+  dingtalkWebhook String?
+  dingtalkSign    Boolean  @default(false)
+  dingtalkKeyword String?
+  dingtalkSecret  String?
+  wechatWebhook   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  codes   Code[]
+}
+
+model Code {
+  id        String    @id @default(cuid())
+  vehicleId String
+  ownerId   String
+  driverId  String?
+  code      String    @unique
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiredAt DateTime?
+
+  vehicle Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  owner   Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  driver  Driver?  @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  records Record[]
+}
+
+model Record {
+  id        String   @id @default(cuid())
+  codeId    String
+  ownerId   String
+  scanTime  DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  location  String?
+  message   String?
+  createdAt DateTime @default(now())
+
+  code  Code  @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  owner Owner @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("records")
+}
+
+model SystemConfig {
+  id          String     @id @default(cuid())
+  key         String     @unique
+  value       String
+  type        ConfigType  @default(BOOLEAN)
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("system_configs")
+}
+
+enum ConfigType {
+  BOOLEAN
+  STRING
+  NUMBER
+  JSON
+}
+
+model NotificationConfig {
+  id                String   @id @default(cuid())
+  ownerId           String   @unique
+  dingtalkWebhook   String?
+  dingtalkSign      Boolean  @default(false)
+  dingtalkKeyword   String?
+  dingtalkSecret    String?
+  wechatWebhook     String?
+  wechatMessage     String?
+  wechatMessageType String?  @default("text")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  owner Owner @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("notification_configs")
+}

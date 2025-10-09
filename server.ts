@@ -1,5 +1,6 @@
 // server.ts - Next.js Standalone + Socket.IO - Updated for database fix
 import { setupSocket } from '@/lib/socket';
+import { initializeSystem } from '@/lib/init-admin';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import next from 'next';
@@ -15,6 +16,9 @@ const hostname = '0.0.0.0';
 // Custom server with Socket.IO integration
 async function createCustomServer() {
   try {
+    // 系统初始化 - 自动创建管理员账户和系统配置
+    await initializeSystem();
+
     // Create Next.js app
     const nextApp = next({ 
       dev,
@@ -48,8 +52,14 @@ async function createCustomServer() {
 
     // Start the server
     server.listen(currentPort, hostname, () => {
-      console.log(`> Ready on http://${hostname}:${currentPort}`);
-      console.log(`> Socket.IO server running at ws://${hostname}:${currentPort}/api/socketio`);
+      console.log(`\n🚀 服务器启动成功:`);
+      console.log(`   📡 HTTP服务: http://${hostname}:${currentPort}`);
+      console.log(`   🔌 WebSocket: ws://${hostname}:${currentPort}/api/socketio`);
+      console.log(`   🌍 环境: ${dev ? '开发环境' : '生产环境'}`);
+      console.log(`\n💡 管理员登录信息:`);
+      console.log(`   用户名: admin`);
+      console.log(`   密码: admin123`);
+      console.log(`   请立即登录并修改密码！\n`);
     });
 
   } catch (err) {
