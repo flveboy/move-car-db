@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -122,19 +123,30 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
             )}
           </Button>
           
-          {onSwitchToRegister && (
-            <div className="text-center text-sm">
-              还没有账号？
-              <Button
-                type="button"
-                variant="link"
-                className="p-0 h-auto text-sm"
-                onClick={onSwitchToRegister}
+          <div className="text-center text-sm space-y-2">
+            {onSwitchToRegister && (
+              <div>
+                还没有账号？
+                <Button
+                  type="button"
+                  variant="link"
+                  className="p-0 h-auto text-sm"
+                  onClick={onSwitchToRegister}
+                >
+                  立即注册
+                </Button>
+              </div>
+            )}
+            
+            <div>
+              <Link
+                href="/forgot-password"
+                className="text-blue-600 hover:text-blue-800 text-sm"
               >
-                立即注册
-              </Button>
+                忘记密码？
+              </Link>
             </div>
-          )}
+          </div>
         </CardFooter>
       </form>
     </Card>
