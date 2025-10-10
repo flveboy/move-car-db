@@ -77,6 +77,7 @@ function ScanContent() {
   const [isConnected, setIsConnected] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [hasLoaded, setHasLoaded] = useState(false)
+  const [recordId, setRecordId] = useState<string | null>(null)
 
   // 消息模板
   const messageTemplates = {
@@ -99,6 +100,13 @@ function ScanContent() {
       setMessage(messageTemplates.default)
     }
   }, [code, hasLoaded])
+
+  // 加载历史消息
+  useEffect(() => {
+    if (sessionId) {
+      loadHistoryMessages()
+    }
+  }, [sessionId])
 
   // WebSocket连接effect
   useEffect(() => {
@@ -140,7 +148,8 @@ function ScanContent() {
           recordId: data.recordId
         }
         
-        setReplyMessages(prev => [...prev, newMessage])
+        // 将新消息插入到列表顶部（保持时间倒序）
+        setReplyMessages(prev => [newMessage, ...prev])
         
         // 显示通知
         toast({
@@ -266,8 +275,18 @@ function ScanContent() {
       if (result.data.sessionId) {
         console.log('设置sessionId:', result.data.sessionId)
         setSessionId(result.data.sessionId)
+        // 设置sessionId后立即加载历史消息
+        setTimeout(() => {
+          loadHistoryMessages()
+        }, 100)
       } else {
         console.log('API响应中没有sessionId')
+      }
+      
+      // 设置记录ID用于加载历史消息
+      if (result.data.recordId) {
+        console.log('设置recordId:', result.data.recordId)
+        setRecordId(result.data.recordId)
       }
       
       // 设置驾驶员信息
@@ -303,6 +322,44 @@ function ScanContent() {
       }
     } catch (error) {
       console.error('加载速率限制信息失败:', error)
+    }
+  }
+
+  const loadHistoryMessages = async () => {
+    try {
+      if (!sessionId) {
+        console.log('sessionId为空，无法加载历史消息')
+        return
+      }
+      
+      console.log('尝试加载历史消息，sessionId:', sessionId)
+      
+      const response = await fetch(`/api/messages/history/${sessionId}`)
+      console.log('历史消息API响应状态:', response.status)
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('历史消息API返回数据:', result)
+        
+        if (result.success && result.data) {
+          console.log('成功加载历史消息:', result.data.replies.length, '条')
+          setReplyMessages(result.data.replies)
+        } else {
+          console.log('API返回数据格式不正确或没有数据')
+          setReplyMessages([])
+        }
+      } else if (response.status === 404) {
+        // 未找到记录是正常情况，清空消息列表
+        console.log('未找到对应的扫码记录，清空历史消息')
+        setReplyMessages([])
+      } else {
+        const errorData = await response.json()
+        console.error('加载历史消息失败:', response.status, errorData.error)
+        setReplyMessages([])
+      }
+    } catch (error) {
+      console.error('加载历史消息失败:', error)
+      setReplyMessages([])
     }
   }
 
@@ -343,6 +400,10 @@ function ScanContent() {
         setNotificationSent(true)
         setShowSuccessModal(true)
         setRateLimitInfo(result.data.rateLimit)
+        // 发送成功后重新加载历史消息
+        if (result.data.recordId) {
+          setRecordId(result.data.recordId)
+        }
       } else {
         if (response.status === 429) {
           setDingtalkBlocked(true)
@@ -398,6 +459,10 @@ function ScanContent() {
         setNotificationSent(true)
         setShowSuccessModal(true)
         setRateLimitInfo(result.data.rateLimit)
+        // 发送成功后重新加载历史消息
+        if (result.data.recordId) {
+          setRecordId(result.data.recordId)
+        }
       } else {
         if (response.status === 429) {
           setWechatBlocked(true)
@@ -721,7 +786,7 @@ function ScanContent() {
                             </Badge>
                           </div>
                           <span className="text-xs text-gray-400">
-                            {new Date(msg.timestamp).toLocaleTimeString()}
+                            {new Date(msg.timestamp).toLocaleString()}
                           </span>
                         </div>
                         <div className="text-sm text-gray-600">{msg.message}</div>
