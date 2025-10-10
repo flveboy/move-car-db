@@ -13,10 +13,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/hooks/use-toast'
 import { AuthGuard } from '@/components/auth/auth-guard'
 import { Header } from '@/components/layout/header'
-import { Plus, Search, Edit, Trash2, Key, UserCheck, UserX, Settings } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Key, UserCheck, UserX, Settings, Database, Trash } from 'lucide-react'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
+import { useAuth } from '@/hooks/use-auth'
 
 interface User {
   id: string
@@ -69,7 +70,19 @@ export default function AdminPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [newPassword, setNewPassword] = useState('')
   
+  // 数据库清理功能
+  const [cleanupStats, setCleanupStats] = useState({
+    recordsToClean: 0,
+    repliesToClean: 0,
+    totalRecords: 0,
+    totalReplies: 0,
+    cutoffTime: ''
+  })
+  const [isCleaning, setIsCleaning] = useState(false)
+  const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false)
+  
   const { toast } = useToast()
+  const { user, token } = useAuth()
 
   // 获取用户列表
   const fetchUsers = async () => {
@@ -84,7 +97,7 @@ export default function AdminPage() {
       
       const response = await fetch(`/api/admin/users?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
         }
       })
       
@@ -122,7 +135,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify(createUserForm)
       })
@@ -167,7 +180,7 @@ export default function AdminPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify({ isActive })
       })
@@ -205,7 +218,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify({ newPassword })
       })
@@ -244,7 +257,7 @@ export default function AdminPage() {
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
         }
       })
       
@@ -273,6 +286,73 @@ export default function AdminPage() {
     }
   }
 
+  // 获取数据库清理统计信息
+  const fetchCleanupStats = async () => {
+    try {
+      const response = await fetch('/api/admin/cleanup', {
+        headers: {
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setCleanupStats(data.data)
+        }
+      }
+    } catch (error) {
+      console.error('获取清理统计失败:', error)
+    }
+  }
+
+  // 执行数据库清理
+  const handleCleanupDatabase = async () => {
+    if (!confirm('确定要清理数据库吗？此操作将删除两天前的records和replies数据，且不可恢复。')) return
+    
+    try {
+      setIsCleaning(true)
+      const response = await fetch('/api/admin/cleanup', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          toast({
+            title: "数据库清理完成",
+            description: `已删除 ${data.data.deletedRecords} 条records记录和 ${data.data.deletedReplies} 条replies记录`
+          })
+          setCleanupDialogOpen(false)
+          fetchCleanupStats() // 刷新统计信息
+        }
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "清理失败",
+          description: errorData.error || "请稍后重试",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "网络错误",
+        description: "请检查网络连接",
+        variant: "destructive"
+      })
+    } finally {
+      setIsCleaning(false)
+    }
+  }
+
+  // 组件挂载时获取清理统计
+  useEffect(() => {
+    fetchCleanupStats()
+  }, [])
+
   return (
     <AuthGuard requireAdmin>
       <div className="min-h-screen bg-gray-50">
@@ -297,6 +377,98 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+
+          {/* 数据库清理功能 */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="mr-2 h-5 w-5" />
+                <span>数据库清理</span>
+              </CardTitle>
+              <CardDescription>
+                自动清理两天前的records和replies数据，释放存储空间
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">当前数据统计</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>总records记录:</span>
+                      <span className="font-medium">{cleanupStats.totalRecords}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>总replies记录:</span>
+                      <span className="font-medium">{cleanupStats.totalReplies}</span>
+                    </div>
+                    <div className="flex justify-between text-red-600">
+                      <span>待清理records:</span>
+                      <span className="font-medium">{cleanupStats.recordsToClean}</span>
+                    </div>
+                    <div className="flex justify-between text-red-600">
+                      <span>待清理replies:</span>
+                      <span className="font-medium">{cleanupStats.repliesToClean}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 text-xs">
+                      <span>清理截止时间:</span>
+                      <span>{cleanupStats.cutoffTime ? new Date(cleanupStats.cutoffTime).toLocaleString('zh-CN') : '计算中...'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center items-center space-y-4">
+                  <Dialog open={cleanupDialogOpen} onOpenChange={setCleanupDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        className="w-full"
+                        disabled={cleanupStats.recordsToClean === 0 && cleanupStats.repliesToClean === 0}
+                      >
+                        <Trash className="mr-2 h-4 w-4" />
+                        执行清理
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>确认数据库清理</DialogTitle>
+                        <DialogDescription>
+                          此操作将永久删除两天前的数据，不可恢复。请确认您要清理以下数据：
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-2 py-4">
+                        <div className="flex justify-between">
+                          <span>待清理records记录:</span>
+                          <span className="font-medium text-red-600">{cleanupStats.recordsToClean}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>待清理replies记录:</span>
+                          <span className="font-medium text-red-600">{cleanupStats.repliesToClean}</span>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          清理截止时间: {cleanupStats.cutoffTime ? new Date(cleanupStats.cutoffTime).toLocaleString('zh-CN') : ''}
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setCleanupDialogOpen(false)}>
+                          取消
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          onClick={handleCleanupDatabase}
+                          disabled={isCleaning}
+                        >
+                          {isCleaning ? '清理中...' : '确认清理'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  <Button variant="outline" onClick={fetchCleanupStats}>
+                    刷新统计
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* 搜索和过滤 */}
           <Card className="mb-6">
