@@ -32,8 +32,8 @@ export async function GET(
     // 获取所有record的ID
     const recordIds = records.map(record => record.id)
 
-    // 根据所有recordId查询最近24小时的回复消息
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    // 根据所有recordId查询最近1小时的回复消息
+    const twentyFourHoursAgo = new Date(Date.now() - 1 * 60 * 60 * 1000)
     
     const replies = await db.reply.findMany({
       where: {
