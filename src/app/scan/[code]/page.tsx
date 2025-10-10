@@ -515,10 +515,10 @@ function ScanContent() {
                 {error}
               </AlertDescription>
             </Alert>
-            <div className="space-y-3 mt-4">
+            <div className="space-y-4 mt-4">
               <Button 
                 onClick={() => window.location.reload()}
-                className="w-full"
+                className="w-full h-10 mb-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 active:scale-95 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-sm"
               >
                 刷新页面
               </Button>
@@ -537,7 +537,7 @@ function ScanContent() {
                   }
                 }}
                 variant="outline"
-                className="w-full"
+                className="w-full h-10 border-gray-300 hover:border-gray-400 active:border-gray-500 active:scale-95 text-gray-700 hover:text-gray-800 active:text-gray-900 font-medium rounded-lg transition-all duration-300 hover:shadow-md active:shadow-sm"
               >
                 退出页面
               </Button>
