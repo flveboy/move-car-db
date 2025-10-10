@@ -717,7 +717,7 @@ function ScanContent() {
                                 color: msg.senderRole === 'ADMIN' ? '#0369a1' : '#0c4a6e'
                               }}
                             >
-                              {msg.senderRole === 'ADMIN' ? '管理员' : '用户'}
+                              {msg.senderRole === 'ADMIN' ? '管理员' : '车主'}
                             </Badge>
                           </div>
                           <span className="text-xs text-gray-400">

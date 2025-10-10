@@ -6,17 +6,19 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { AuthGuard } from '@/components/auth/auth-guard'
 import { Header } from '@/components/layout/header'
+import { EditProfileDialog } from '@/components/profile/edit-profile-dialog'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Car, QrCode, Bell, Calendar } from 'lucide-react'
+import { Car, QrCode, Bell, Calendar, Edit } from 'lucide-react'
 
 export default function ProfilePage() {
   const { user, token } = useAuth()
   const router = useRouter()
   const [stats, setStats] = useState({ vehicleCount: 0, codeCount: 0, notificationCount: 0 })
   const [loading, setLoading] = useState(true)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -51,9 +53,15 @@ export default function ProfilePage() {
       <div className="max-w-3xl mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">个人资料</h1>
-          <Button variant="outline" onClick={() => router.push('/')}>
-            返回主页
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+              <Edit className="h-4 w-4 mr-2" />
+              编辑资料
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/')}>
+              返回主页
+            </Button>
+          </div>
         </div>
         
         <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6 bg-gradient-to-br from-blue-50 to-white">
@@ -152,6 +160,15 @@ export default function ProfilePage() {
           {/* 移除了"前往设置"按钮 */}
         </div>
       </div>
+
+      <EditProfileDialog 
+        open={editDialogOpen} 
+        onOpenChange={setEditDialogOpen}
+        onProfileUpdated={() => {
+          // 刷新页面以获取更新后的用户信息
+          window.location.reload()
+        }}
+      />
     </AuthGuard>
   )
 }

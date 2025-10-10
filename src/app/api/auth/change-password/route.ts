@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
     // 获取并验证 token
     const authHeader = request.headers.get('authorization')
     const token = getTokenFromHeader(authHeader || undefined)
-    
     if (!token) {
       return NextResponse.json(
         { error: '未提供认证令牌' },

@@ -83,6 +83,7 @@ export function formatAuthUser(user: any): AuthUser {
     phone: user.phone,
     name: user.name,
     email: user.email || undefined,
-    role: user.role
+    role: user.role,
+    createdAt: user.createdAt
   }
 }
