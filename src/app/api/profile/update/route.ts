@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
-import { useAuth } from '@/hooks/use-auth'
 
 export async function PUT(request: NextRequest) {
   try {
     // 获取认证令牌
-    // const authHeader = request.headers.get('authorization')
-    // const token = getTokenFromHeader(authHeader || undefined)
-    
-    // 改为从useAuth中获取
-    const { user, token } = useAuth()
+    const authHeader = request.headers.get('authorization')
+    const token = getTokenFromHeader(authHeader || undefined)
 
     if (!token) {
       return NextResponse.json(

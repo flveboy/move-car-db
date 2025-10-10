@@ -10,10 +10,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
 import { AuthGuard } from '@/components/auth/auth-guard'
 import { Header } from '@/components/layout/header'
-import { Plus, Search, Edit, Trash2, Key, UserCheck, UserX, Settings, Database, Trash } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Key, UserCheck, UserX, Settings, Database, Trash, Users, Wrench, Save, RefreshCw } from 'lucide-react'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
@@ -46,6 +47,9 @@ interface CreateUserData {
 }
 
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<'users' | 'system' | 'cleanup'>('users')
+  
+  // 用户管理相关状态
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -80,6 +84,12 @@ export default function AdminPage() {
   })
   const [isCleaning, setIsCleaning] = useState(false)
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false)
+  
+  // 系统配置功能
+  const [configs, setConfigs] = useState<any[]>([])
+  const [configLoading, setConfigLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [configValues, setConfigValues] = useState<Record<string, string>>({})
   
   const { toast } = useToast()
   const { user, token } = useAuth()
@@ -348,9 +358,104 @@ export default function AdminPage() {
     }
   }
 
-  // 组件挂载时获取清理统计
+  // 获取系统配置
+  const fetchConfigs = async () => {
+    try {
+      setConfigLoading(true)
+      const response = await fetch('/api/admin/system-config', {
+        headers: {
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setConfigs(data.configs)
+        
+        // 初始化配置值
+        const values: Record<string, string> = {}
+        data.configs.forEach((config: any) => {
+          values[config.key] = config.value
+        })
+        
+        // 如果没有开放注册配置，添加默认值
+        if (!data.configs.find((c: any) => c.key === 'ALLOW_REGISTRATION')) {
+          values['ALLOW_REGISTRATION'] = 'true'
+        }
+        
+        setConfigValues(values)
+      } else {
+        toast({
+          title: "获取系统配置失败",
+          description: "请检查权限或稍后重试",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "网络错误",
+        description: "请检查网络连接",
+        variant: "destructive"
+      })
+    } finally {
+      setConfigLoading(false)
+    }
+  }
+
+  // 更新配置值
+  const handleConfigChange = (key: string, value: string) => {
+    setConfigValues(prev => ({
+      ...prev,
+      [key]: value
+    }))
+  }
+
+  // 保存配置
+  const handleSaveConfig = async (key: string, type: string = 'BOOLEAN') => {
+    try {
+      setSaving(true)
+      const response = await fetch('/api/admin/system-config', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          key,
+          value: configValues[key],
+          type
+        })
+      })
+      
+      if (response.ok) {
+        toast({
+          title: "配置保存成功",
+          description: "系统配置已更新"
+        })
+        await fetchConfigs() // 重新获取配置
+      } else {
+        const error = await response.json()
+        toast({
+          title: "保存配置失败",
+          description: error.error,
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "网络错误",
+        description: "请检查网络连接",
+        variant: "destructive"
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // 组件挂载时获取清理统计和系统配置
   useEffect(() => {
     fetchCleanupStats()
+    fetchConfigs()
   }, [])
 
   return (
@@ -359,116 +464,66 @@ export default function AdminPage() {
         <Header title="管理后台" />
         
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          {/* 标签页导航 */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">用户管理</h1>
+                <h1 className="text-2xl font-bold text-gray-900">管理后台</h1>
+                <p className="mt-1 text-sm text-gray-600">
+                  系统管理和维护功能
+                </p>
+              </div>
+            </div>
+            
+            {/* 标签页切换 */}
+            <div className="mt-6 border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'users'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Users className="inline-block mr-2 h-4 w-4" />
+                  用户管理
+                </button>
+                <button
+                  onClick={() => setActiveTab('system')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'system'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Wrench className="inline-block mr-2 h-4 w-4" />
+                  系统配置
+                </button>
+                <button
+                  onClick={() => setActiveTab('cleanup')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'cleanup'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Database className="inline-block mr-2 h-4 w-4" />
+                  数据库清理
+                </button>
+              </nav>
+            </div>
+          </div>
+
+          {/* 用户管理标签页内容 */}
+          {activeTab === 'users' && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">用户管理</h2>
                 <p className="mt-1 text-sm text-gray-600">
                   管理系统用户，包括创建、编辑、删除用户等操作
                 </p>
               </div>
-              <div className="flex items-center space-x-4">
-                <Link href="/admin/system-config">
-                  <Button variant="outline">
-                    <Settings className="mr-2 h-4 w-4" />
-                    系统配置
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* 数据库清理功能 */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Database className="mr-2 h-5 w-5" />
-                <span>数据库清理</span>
-              </CardTitle>
-              <CardDescription>
-                自动清理两天前的records和replies数据，释放存储空间
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">当前数据统计</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>总records记录:</span>
-                      <span className="font-medium">{cleanupStats.totalRecords}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>总replies记录:</span>
-                      <span className="font-medium">{cleanupStats.totalReplies}</span>
-                    </div>
-                    <div className="flex justify-between text-red-600">
-                      <span>待清理records:</span>
-                      <span className="font-medium">{cleanupStats.recordsToClean}</span>
-                    </div>
-                    <div className="flex justify-between text-red-600">
-                      <span>待清理replies:</span>
-                      <span className="font-medium">{cleanupStats.repliesToClean}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-500 text-xs">
-                      <span>清理截止时间:</span>
-                      <span>{cleanupStats.cutoffTime ? new Date(cleanupStats.cutoffTime).toLocaleString('zh-CN') : '计算中...'}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col justify-center items-center space-y-4">
-                  <Dialog open={cleanupDialogOpen} onOpenChange={setCleanupDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        variant="destructive" 
-                        className="w-full"
-                        disabled={cleanupStats.recordsToClean === 0 && cleanupStats.repliesToClean === 0}
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        执行清理
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>确认数据库清理</DialogTitle>
-                        <DialogDescription>
-                          此操作将永久删除两天前的数据，不可恢复。请确认您要清理以下数据：
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-2 py-4">
-                        <div className="flex justify-between">
-                          <span>待清理records记录:</span>
-                          <span className="font-medium text-red-600">{cleanupStats.recordsToClean}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>待清理replies记录:</span>
-                          <span className="font-medium text-red-600">{cleanupStats.repliesToClean}</span>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          清理截止时间: {cleanupStats.cutoffTime ? new Date(cleanupStats.cutoffTime).toLocaleString('zh-CN') : ''}
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setCleanupDialogOpen(false)}>
-                          取消
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          onClick={handleCleanupDatabase}
-                          disabled={isCleaning}
-                        >
-                          {isCleaning ? '清理中...' : '确认清理'}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                  <Button variant="outline" onClick={fetchCleanupStats}>
-                    刷新统计
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* 搜索和过滤 */}
           <Card className="mb-6">
@@ -744,6 +799,202 @@ export default function AdminPage() {
               )}
             </CardContent>
           </Card>
+            </div>
+          )}
+          
+          {/* 系统配置标签页内容 */}
+          {activeTab === 'system' && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">系统配置</h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  管理系统的全局配置项和功能开关
+                </p>
+              </div>
+
+              {/* 用户注册配置 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>用户注册设置</CardTitle>
+                  <CardDescription>
+                    控制新用户注册功能的开关
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label htmlFor="allow-registration" className="text-base font-medium">
+                        开放注册
+                      </Label>
+                      <p className="text-sm text-gray-500">
+                        开启后允许新用户自主注册账号；关闭后仅管理员可创建用户
+                      </p>
+                    </div>
+                    <Switch
+                      id="allow-registration"
+                      checked={configValues['ALLOW_REGISTRATION'] === 'true'}
+                      onCheckedChange={(checked) => 
+                        handleConfigChange('ALLOW_REGISTRATION', checked ? 'true' : 'false')
+                      }
+                    />
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center space-x-4">
+                      <Button 
+                        onClick={() => handleSaveConfig('ALLOW_REGISTRATION', 'BOOLEAN')}
+                        disabled={saving}
+                        className="flex items-center"
+                      >
+                        {saving ? (
+                          <>
+                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                            保存中...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            保存配置
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={fetchConfigs}
+                        disabled={saving}
+                      >
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        刷新
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 配置状态提示 */}
+              <Alert>
+                <Settings className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="space-y-2">
+                    <div className="font-medium">当前配置状态：</div>
+                    <div className="text-sm">
+                      • 开放注册: <span className={`font-medium ${configValues['ALLOW_REGISTRATION'] === 'true' ? 'text-green-600' : 'text-red-600'}`}>
+                        {configValues['ALLOW_REGISTRATION'] === 'true' ? '开启' : '关闭'}
+                      </span>
+                    </div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+
+              {/* 未来扩展区域 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>更多配置</CardTitle>
+                  <CardDescription>
+                    更多系统配置项将在后续版本中添加
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8 text-gray-500">
+                    <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>敬请期待更多配置选项...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {/* 数据库清理标签页内容 */}
+          {activeTab === 'cleanup' && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">数据库清理</h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  清理过期数据，释放存储空间
+                </p>
+              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>数据库清理统计</CardTitle>
+                  <CardDescription>
+                    显示需要清理的数据统计信息
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="font-medium">Records 表</h3>
+                      <p>总记录数: {cleanupStats.totalRecords}</p>
+                      <p>待清理记录: {cleanupStats.recordsToClean}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Replies 表</h3>
+                      <p>总记录数: {cleanupStats.totalReplies}</p>
+                      <p>待清理记录: {cleanupStats.repliesToClean}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-600">
+                      清理时间点: {cleanupStats.cutoffTime ? format(new Date(cleanupStats.cutoffTime), 'yyyy-MM-dd HH:mm:ss') : '计算中...'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>执行清理</CardTitle>
+                  <CardDescription>
+                    清理两天前的数据记录
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Alert>
+                    <AlertDescription>
+                      此操作将删除两天前的records和replies数据，删除后无法恢复，请谨慎操作。
+                    </AlertDescription>
+                  </Alert>
+                  <div className="mt-4">
+                    <Dialog open={cleanupDialogOpen} onOpenChange={setCleanupDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="destructive">
+                          <Trash className="mr-2 h-4 w-4" />
+                          执行数据库清理
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>确认数据库清理</DialogTitle>
+                          <DialogDescription>
+                            确定要清理数据库吗？此操作将删除两天前的数据，且不可恢复。
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div>
+                          <p>将删除以下数据：</p>
+                          <ul className="list-disc list-inside mt-2">
+                            <li>Records 表: {cleanupStats.recordsToClean} 条记录</li>
+                            <li>Replies 表: {cleanupStats.repliesToClean} 条记录</li>
+                          </ul>
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setCleanupDialogOpen(false)}>
+                            取消
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            onClick={handleCleanupDatabase}
+                            disabled={isCleaning}
+                          >
+                            {isCleaning ? '清理中...' : '确认清理'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </AuthGuard>
