@@ -213,8 +213,17 @@ export default function Home() {
     messageType: 'text'
   })
 
-  // 保存用户通知测试配置
-  const saveNotificationConfig = async () => {
+  // 保存配置加载状态
+  const [savingDingtalkConfig, setSavingDingtalkConfig] = useState(false)
+  const [savingWechatConfig, setSavingWechatConfig] = useState(false)
+  
+  // 发送通知加载状态
+  const [sendingDingtalkNotification, setSendingDingtalkNotification] = useState(false)
+  const [sendingWechatNotification, setSendingWechatNotification] = useState(false)
+
+  // 保存钉钉通知测试配置
+  const saveDingtalkNotificationConfig = async () => {
+    setSavingDingtalkConfig(true)
     try {
       const config = {
         dingtalkWebhook: dingtalkTestForm.webhook,
@@ -235,11 +244,62 @@ export default function Home() {
         body: JSON.stringify(config)
       })
 
-      if (!response.ok) {
+      if (response.ok) {
+        toast({
+          title: "配置保存成功",
+          variant: "default"
+        })
+      } else {
         throw new Error('保存配置失败')
       }
     } catch (error) {
       console.error('保存通知配置失败:', error)
+      toast({
+        title: "保存配置失败",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
+    } finally {
+      setSavingDingtalkConfig(false)
+    }
+  }
+
+  // 保存企微通知测试配置
+  const saveWechatNotificationConfig = async () => {
+    setSavingWechatConfig(true)
+    try {
+      const config = {
+        wechatWebhook: wechatTestForm.webhook,
+        wechatMessage: wechatTestForm.message,
+        wechatMessageType: wechatTestForm.messageType
+      }
+      
+      const response = await fetch('/api/user/notification-config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(config)
+      })
+
+      if (response.ok) {
+        toast({
+          title: "配置保存成功",
+          variant: "default"
+        })
+      } else {
+        throw new Error('保存配置失败')
+      }
+    } catch (error) {
+      console.error('保存通知配置失败:', error)
+      toast({
+        title: "保存配置失败",
+        description: "请稍后重试",
+        variant: "destructive"
+      })
+    } finally {
+      setSavingWechatConfig(false)
     }
   }
 
@@ -838,7 +898,7 @@ export default function Home() {
       return
     }
 
-    setIsLoading(true)
+    setSendingDingtalkNotification(true)
     
     try {
       const response = await fetch('/api/notifications/test-dingtalk', {
@@ -879,7 +939,7 @@ export default function Home() {
         variant: "destructive"
       })
     } finally {
-      setIsLoading(false)
+      setSendingDingtalkNotification(false)
     }
   }
 
@@ -1249,7 +1309,7 @@ export default function Home() {
       return
     }
 
-    setIsLoading(true)
+    setSendingWechatNotification(true)
     
     try {
       const response = await fetch('/api/notifications/test-wechat', {
@@ -1288,7 +1348,7 @@ export default function Home() {
         variant: "destructive"
       })
     } finally {
-      setIsLoading(false)
+      setSendingWechatNotification(false)
     }
   }
 
@@ -2312,19 +2372,26 @@ export default function Home() {
                             </div>
                             <div className="flex space-x-2">
                               <Button 
-                                onClick={saveNotificationConfig}
+                                onClick={saveDingtalkNotificationConfig}
                                 variant="outline"
                                 className="flex-1 h-10 border-gray-300 text-gray-700 hover:bg-gray-50"
-                                disabled={isLoading}
+                                disabled={savingDingtalkConfig || isLoading}
                               >
-                                保存配置
+                                {savingDingtalkConfig ? (
+                                  <div className="flex items-center justify-center">
+                                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                    保存中...
+                                  </div>
+                                ) : (
+                                  '保存配置'
+                                )}
                               </Button>
                               <Button 
                                 onClick={handleTestDingTalkNotification}
                                 className="flex-1 h-12 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
-                                disabled={isLoading}
+                                disabled={sendingDingtalkNotification}
                               >
-                                {isLoading ? (
+                                {sendingDingtalkNotification ? (
                                   <div className="flex items-center justify-center">
                                     <Loader2 className="animate-spin h-5 w-5 mr-2" />
                                     发送中...
@@ -2400,19 +2467,26 @@ export default function Home() {
                             </div>
                             <div className="flex space-x-2">
                               <Button 
-                                onClick={saveNotificationConfig}
+                                onClick={saveWechatNotificationConfig}
                                 variant="outline"
                                 className="flex-1 h-10 border-gray-300 text-gray-700 hover:bg-gray-50"
-                                disabled={isLoading}
+                                disabled={savingWechatConfig || isLoading}
                               >
-                                保存配置
+                                {savingWechatConfig ? (
+                                  <div className="flex items-center justify-center">
+                                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                                    保存中...
+                                  </div>
+                                ) : (
+                                  '保存配置'
+                                )}
                               </Button>
                               <Button 
                                 onClick={handleTestWechatNotification}
                                 className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
-                                disabled={isLoading}
+                                disabled={sendingWechatNotification}
                               >
-                                {isLoading ? (
+                                {sendingWechatNotification ? (
                                   <div className="flex items-center justify-center">
                                     <Loader2 className="animate-spin h-5 w-5 mr-2" />
                                     发送中...
