@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -48,13 +48,9 @@ interface CreateUserData {
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'system' | 'cleanup'>('users')
+  const isInitialRender = useRef(true)
   
-  // 标签页切换时重置配置值为数据库实际值
-  useEffect(() => {
-    if (activeTab === 'system') {
-      fetchConfigs() // 重新获取配置，重置为数据库实际值
-    }
-  }, [activeTab])
+
   
   // 用户管理相关状态
   const [users, setUsers] = useState<User[]>([])
@@ -141,9 +137,7 @@ export default function AdminPage() {
     }
   }
 
-  useEffect(() => {
-    fetchUsers()
-  }, [currentPage, searchTerm, roleFilter])
+
 
   // 创建用户相关状态
   const [isCreating, setIsCreating] = useState(false)
@@ -562,11 +556,28 @@ export default function AdminPage() {
     }
   }
 
-  // 组件挂载时获取清理统计和系统配置
+  // 标签页切换时获取对应数据
   useEffect(() => {
-    fetchCleanupStats()
-    fetchConfigs()
-  }, [])
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
+    
+    if (activeTab === 'users') {
+      fetchUsers()
+    } else if (activeTab === 'system') {
+      fetchConfigs()
+    } else if (activeTab === 'cleanup') {
+      fetchCleanupStats()
+    }
+  }, [activeTab])
+
+  // 用户管理相关参数变化时重新获取数据
+  useEffect(() => {
+    if (activeTab === 'users') {
+      fetchUsers()
+    }
+  }, [currentPage, searchTerm, roleFilter])
 
   return (
     <AuthGuard requireAdmin>
