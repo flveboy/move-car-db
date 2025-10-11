@@ -138,9 +138,13 @@ export default function AdminPage() {
     fetchUsers()
   }, [currentPage, searchTerm, roleFilter])
 
+  // 创建用户相关状态
+  const [isCreating, setIsCreating] = useState(false)
+
   // 创建用户
   const handleCreateUser = async () => {
     try {
+      setIsCreating(true)
       const response = await fetch('/api/admin/users', {
         method: 'POST',
         headers: {
@@ -180,12 +184,18 @@ export default function AdminPage() {
         description: "请检查网络连接",
         variant: "destructive"
       })
+    } finally {
+      setIsCreating(false)
     }
   }
+
+  // 更新用户状态相关状态
+  const [togglingUser, setTogglingUser] = useState<string | null>(null)
 
   // 更新用户状态
   const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
     try {
+      setTogglingUser(userId)
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'PUT',
         headers: {
@@ -216,14 +226,20 @@ export default function AdminPage() {
         description: "请检查网络连接",
         variant: "destructive"
       })
+    } finally {
+      setTogglingUser(null)
     }
   }
+
+  // 重置密码相关状态
+  const [isResetting, setIsResetting] = useState(false)
 
   // 重置密码
   const handleResetPassword = async () => {
     if (!selectedUser || !newPassword) return
     
     try {
+      setIsResetting(true)
       const response = await fetch(`/api/admin/users/${selectedUser.id}/reset-password`, {
         method: 'POST',
         headers: {
@@ -256,13 +272,84 @@ export default function AdminPage() {
         description: "请检查网络连接",
         variant: "destructive"
       })
+    } finally {
+      setIsResetting(false)
     }
   }
+
+  // 编辑用户相关状态
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [userToEdit, setUserToEdit] = useState<User | null>(null)
+  const [editUserForm, setEditUserForm] = useState<CreateUserData>({
+    username: '',
+    phone: '',
+    name: '',
+    email: '',
+    role: 'USER',
+    isActive: true
+  })
+  const [isEditing, setIsEditing] = useState(false)
 
   // 删除用户相关状态
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // 打开编辑对话框
+  const openEditDialog = (user: User) => {
+    setUserToEdit(user)
+    setEditUserForm({
+      username: user.username,
+      phone: user.phone,
+      name: user.name,
+      email: user.email || '',
+      role: user.role,
+      isActive: user.isActive
+    })
+    setIsEditDialogOpen(true)
+  }
+
+  // 更新用户信息
+  const handleEditUser = async () => {
+    if (!userToEdit) return
+    
+    try {
+      setIsEditing(true)
+      const response = await fetch(`/api/admin/users/${userToEdit.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify(editUserForm)
+      })
+      
+      if (response.ok) {
+        toast({
+          title: "用户信息更新成功",
+          description: "用户信息已成功更新"
+        })
+        setIsEditDialogOpen(false)
+        setUserToEdit(null)
+        fetchUsers()
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "更新失败",
+          description: errorData.error || "请稍后重试",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "网络错误",
+        description: "请检查网络连接",
+        variant: "destructive"
+      })
+    } finally {
+      setIsEditing(false)
+    }
+  }
 
   // 打开删除确认对话框
   const openDeleteDialog = (user: User) => {
@@ -531,6 +618,90 @@ export default function AdminPage() {
             </div>
           </div>
 
+          {/* 编辑用户对话框 */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl">编辑用户信息</DialogTitle>
+                <DialogDescription className="text-base">
+                  修改用户 {userToEdit?.name} 的基本信息
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-6 py-4">
+                <div className="space-y-3">
+                  <Label htmlFor="edit-name" className="text-sm font-medium">姓名</Label>
+                  <Input
+                    id="edit-name"
+                    value={editUserForm.name}
+                    onChange={(e) => setEditUserForm({ ...editUserForm, name: e.target.value })}
+                    placeholder="请输入姓名"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="edit-phone" className="text-sm font-medium">手机号</Label>
+                  <Input
+                    id="edit-phone"
+                    value={editUserForm.phone}
+                    onChange={(e) => setEditUserForm({ ...editUserForm, phone: e.target.value })}
+                    placeholder="请输入手机号"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="edit-email" className="text-sm font-medium">邮箱（可选）</Label>
+                  <Input
+                    id="edit-email"
+                    value={editUserForm.email || ''}
+                    onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+                    placeholder="请输入邮箱"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="edit-role" className="text-sm font-medium">角色</Label>
+                  <Select value={editUserForm.role} onValueChange={(value: 'USER' | 'ADMIN') => setEditUserForm({ ...editUserForm, role: value })}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USER">普通用户</SelectItem>
+                      <SelectItem value="ADMIN">管理员</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="edit-active" className="text-sm font-medium">启用状态</Label>
+                  <Switch
+                    id="edit-active"
+                    checked={editUserForm.isActive}
+                    onCheckedChange={(checked) => setEditUserForm({ ...editUserForm, isActive: checked })}
+                    className="data-[state=checked]:bg-green-500"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="gap-4 sm:gap-3">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="flex-1 sm:flex-none">
+                  取消
+                </Button>
+                <Button 
+                  onClick={handleEditUser} 
+                  disabled={isEditing}
+                  className="flex-1 sm:flex-none"
+                >
+                  {isEditing ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      保存中...
+                    </>
+                  ) : (
+                    '保存修改'
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {/* 删除确认对话框 */}
           <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <DialogContent className="max-w-md">
@@ -658,11 +829,18 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <DialogFooter className="gap-4 sm:gap-3">
-                      <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="flex-1 sm:flex-none">
+                      <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="flex-1 sm:flex-none" disabled={isCreating}>
                         取消
                       </Button>
-                      <Button onClick={handleCreateUser} className="flex-1 sm:flex-none">
-                        创建用户
+                      <Button onClick={handleCreateUser} className="flex-1 sm:flex-none" disabled={isCreating}>
+                        {isCreating ? (
+                          <>
+                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                            创建中...
+                          </>
+                        ) : (
+                          '创建用户'
+                        )}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -740,7 +918,7 @@ export default function AdminPage() {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={user.isActive ? 'default' : 'destructive'}>
+                            <Badge variant={user.isActive ? 'default' : 'destructive'} className={user.isActive ? 'bg-green-500 hover:bg-green-600' : ''}>
                               {user.isActive ? '启用' : '禁用'}
                             </Badge>
                           </TableCell>
@@ -762,6 +940,15 @@ export default function AdminPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end space-x-2">
+                              {/* 编辑按钮 */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openEditDialog(user)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              
                               <Dialog open={isResetPasswordDialogOpen && selectedUser?.id === user.id} onOpenChange={(open) => {
                                 setIsResetPasswordDialogOpen(open)
                                 if (!open) setSelectedUser(null)
@@ -796,16 +983,23 @@ export default function AdminPage() {
                                       <p className="text-xs text-gray-500">密码长度至少6位</p>
                                     </div>
                                   </div>
-                                  <DialogFooter className="gap-3 sm:gap-0">
+                                  <DialogFooter className="gap-4 sm:gap-3">
                                     <Button variant="outline" onClick={() => setIsResetPasswordDialogOpen(false)} className="flex-1 sm:flex-none">
                                       取消
                                     </Button>
                                     <Button 
                                       onClick={handleResetPassword} 
-                                      disabled={!newPassword || newPassword.length < 6}
+                                      disabled={!newPassword || newPassword.length < 6 || isResetting}
                                       className="flex-1 sm:flex-none"
                                     >
-                                      重置密码
+                                      {isResetting ? (
+                                        <>
+                                          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                          重置中...
+                                        </>
+                                      ) : (
+                                        '重置密码'
+                                      )}
                                     </Button>
                                   </DialogFooter>
                                 </DialogContent>
@@ -817,8 +1011,15 @@ export default function AdminPage() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleToggleUserStatus(user.id, !user.isActive)}
+                                  disabled={togglingUser === user.id}
                                 >
-                                  {user.isActive ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                                  {togglingUser === user.id ? (
+                                    <RefreshCw className="h-4 w-4 animate-spin" />
+                                  ) : user.isActive ? (
+                                    <UserX className="h-4 w-4" />
+                                  ) : (
+                                    <UserCheck className="h-4 w-4" />
+                                  )}
                                 </Button>
                               )}
                               
@@ -909,6 +1110,7 @@ export default function AdminPage() {
                       onCheckedChange={(checked) => 
                         handleConfigChange('ALLOW_REGISTRATION', checked ? 'true' : 'false')
                       }
+                      className="data-[state=checked]:bg-green-500"
                     />
                   </div>
                   

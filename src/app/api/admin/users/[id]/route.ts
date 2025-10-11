@@ -6,6 +6,7 @@ import { z } from 'zod'
 // 用户更新验证 schema
 const updateUserSchema = z.object({
   name: z.string().min(2, '姓名至少2个字符').optional(),
+  phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号').optional(),
   email: z.string().email('请输入有效的邮箱地址').optional().or(z.literal('')),
   role: z.enum(['USER', 'ADMIN']).optional(),
   isActive: z.boolean().optional()
@@ -112,6 +113,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         where: { id },
         data: {
           ...(validatedData.name && { name: validatedData.name }),
+          ...(validatedData.phone && { phone: validatedData.phone }),
           ...(validatedData.email !== undefined && { email: validatedData.email || null }),
           ...(validatedData.role && { role: validatedData.role }),
           ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive })
