@@ -59,6 +59,15 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // 检查新密码是否与旧密码相同
+    const isSamePassword = await verifyPassword(validatedData.newPassword, user.password)
+    if (isSamePassword) {
+      return NextResponse.json(
+        { error: '新密码不能与旧密码相同' },
+        { status: 400 }
+      )
+    }
     
     // 哈希新密码
     const hashedNewPassword = await hashPassword(validatedData.newPassword)
