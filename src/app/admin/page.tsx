@@ -537,54 +537,58 @@ export default function AdminPage() {
                       创建用户
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-md">
                     <DialogHeader>
-                      <DialogTitle>创建新用户</DialogTitle>
-                      <DialogDescription>
+                      <DialogTitle className="text-xl">创建新用户</DialogTitle>
+                      <DialogDescription className="text-base">
                         填写用户信息，初始密码为手机号后6位
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="username">用户名</Label>
+                    <div className="space-y-6 py-4">
+                      <div className="space-y-3">
+                        <Label htmlFor="username" className="text-sm font-medium">用户名</Label>
                         <Input
                           id="username"
                           value={createUserForm.username}
                           onChange={(e) => setCreateUserForm({ ...createUserForm, username: e.target.value })}
                           placeholder="请输入用户名"
+                          className="h-10"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="phone">手机号</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="phone" className="text-sm font-medium">手机号</Label>
                         <Input
                           id="phone"
                           value={createUserForm.phone}
                           onChange={(e) => setCreateUserForm({ ...createUserForm, phone: e.target.value })}
                           placeholder="请输入手机号"
+                          className="h-10"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="name">姓名</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="name" className="text-sm font-medium">姓名</Label>
                         <Input
                           id="name"
                           value={createUserForm.name}
                           onChange={(e) => setCreateUserForm({ ...createUserForm, name: e.target.value })}
                           placeholder="请输入姓名"
+                          className="h-10"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="email">邮箱（可选）</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="email" className="text-sm font-medium">邮箱（可选）</Label>
                         <Input
                           id="email"
                           value={createUserForm.email || ''}
                           onChange={(e) => setCreateUserForm({ ...createUserForm, email: e.target.value })}
                           placeholder="请输入邮箱"
+                          className="h-10"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="role">角色</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="role" className="text-sm font-medium">角色</Label>
                         <Select value={createUserForm.role} onValueChange={(value: 'USER' | 'ADMIN') => setCreateUserForm({ ...createUserForm, role: value })}>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -594,11 +598,13 @@ export default function AdminPage() {
                         </Select>
                       </div>
                     </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                    <DialogFooter className="gap-3 sm:gap-0">
+                      <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="flex-1 sm:flex-none">
                         取消
                       </Button>
-                      <Button onClick={handleCreateUser}>创建</Button>
+                      <Button onClick={handleCreateUser} className="flex-1 sm:flex-none">
+                        创建用户
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -710,29 +716,37 @@ export default function AdminPage() {
                                     <Key className="h-4 w-4" />
                                   </Button>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className="max-w-md">
                                   <DialogHeader>
-                                    <DialogTitle>重置密码</DialogTitle>
-                                    <DialogDescription>
+                                    <DialogTitle className="text-xl">重置密码</DialogTitle>
+                                    <DialogDescription className="text-base">
                                       为用户 {user.name} 重置密码
                                     </DialogDescription>
                                   </DialogHeader>
-                                  <div>
-                                    <Label htmlFor="newPassword">新密码</Label>
-                                    <Input
-                                      id="newPassword"
-                                      type="password"
-                                      value={newPassword}
-                                      onChange={(e) => setNewPassword(e.target.value)}
-                                      placeholder="请输入新密码（至少6位）"
-                                    />
+                                  <div className="space-y-4 py-4">
+                                    <div className="space-y-3">
+                                      <Label htmlFor="newPassword" className="text-sm font-medium">新密码</Label>
+                                      <Input
+                                        id="newPassword"
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder="请输入新密码（至少6位）"
+                                        className="h-10"
+                                      />
+                                      <p className="text-xs text-gray-500">密码长度至少6位</p>
+                                    </div>
                                   </div>
-                                  <DialogFooter>
-                                    <Button variant="outline" onClick={() => setIsResetPasswordDialogOpen(false)}>
+                                  <DialogFooter className="gap-3 sm:gap-0">
+                                    <Button variant="outline" onClick={() => setIsResetPasswordDialogOpen(false)} className="flex-1 sm:flex-none">
                                       取消
                                     </Button>
-                                    <Button onClick={handleResetPassword} disabled={!newPassword || newPassword.length < 6}>
-                                      重置
+                                    <Button 
+                                      onClick={handleResetPassword} 
+                                      disabled={!newPassword || newPassword.length < 6}
+                                      className="flex-1 sm:flex-none"
+                                    >
+                                      重置密码
                                     </Button>
                                   </DialogFooter>
                                 </DialogContent>
