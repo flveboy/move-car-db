@@ -259,12 +259,24 @@ export default function AdminPage() {
     }
   }
 
+  // 删除用户相关状态
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // 打开删除确认对话框
+  const openDeleteDialog = (user: User) => {
+    setUserToDelete(user)
+    setIsDeleteDialogOpen(true)
+  }
+
   // 删除用户
-  const handleDeleteUser = async (userId: string) => {
-    if (!confirm('确定要删除该用户吗？此操作不可恢复。')) return
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return
     
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      setIsDeleting(true)
+      const response = await fetch(`/api/admin/users/${userToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token || localStorage.getItem('auth_token')}`
@@ -293,6 +305,10 @@ export default function AdminPage() {
         description: "请检查网络连接",
         variant: "destructive"
       })
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteDialogOpen(false)
+      setUserToDelete(null)
     }
   }
 
@@ -515,6 +531,49 @@ export default function AdminPage() {
             </div>
           </div>
 
+          {/* 删除确认对话框 */}
+          <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl">确认删除</DialogTitle>
+                <DialogDescription className="text-base">
+                  确定要删除用户 {userToDelete?.name} ({userToDelete?.username}) 吗？
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    此操作不可恢复！将删除该用户及其所有相关数据（车辆、挪车码、记录等）。
+                  </AlertDescription>
+                </Alert>
+              </div>
+              <DialogFooter className="gap-4 sm:gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                  className="flex-1 sm:flex-none"
+                >
+                  取消
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDeleteUser}
+                  disabled={isDeleting}
+                  className="flex-1 sm:flex-none"
+                >
+                  {isDeleting ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      删除中...
+                    </>
+                  ) : (
+                    '确认删除'
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {/* 用户管理标签页内容 */}
           {activeTab === 'users' && (
             <div>
@@ -598,7 +657,7 @@ export default function AdminPage() {
                         </Select>
                       </div>
                     </div>
-                    <DialogFooter className="gap-3 sm:gap-0">
+                    <DialogFooter className="gap-4 sm:gap-3">
                       <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="flex-1 sm:flex-none">
                         取消
                       </Button>
@@ -768,7 +827,7 @@ export default function AdminPage() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleDeleteUser(user.id)}
+                                  onClick={() => openDeleteDialog(user)}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
