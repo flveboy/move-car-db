@@ -49,6 +49,13 @@ interface CreateUserData {
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'system' | 'cleanup'>('users')
   
+  // 标签页切换时重置配置值为数据库实际值
+  useEffect(() => {
+    if (activeTab === 'system') {
+      fetchConfigs() // 重新获取配置，重置为数据库实际值
+    }
+  }, [activeTab])
+  
   // 用户管理相关状态
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
