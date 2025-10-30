@@ -10,15 +10,20 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
+import { useLoading } from '@/components/layout/loading-provider'
+import { PageLoading } from '@/components/layout/page-loading'
+
 
 export default function SettingPage() {
   const { user, logout } = useAuth()
+  const { setLoading, isLoading } = useLoading()
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-
+  
   if (!user) return null
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -33,6 +38,7 @@ export default function SettingPage() {
     }
 
     try {
+      setIsChangingPassword(true)
       const response = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: {
@@ -66,6 +72,8 @@ export default function SettingPage() {
         description: "请稍后重试",
         variant: "destructive"
       })
+    } finally {
+      setIsChangingPassword(false)
     }
   }
 
@@ -75,8 +83,8 @@ export default function SettingPage() {
       <div className="max-w-3xl mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">账户设置</h1>
-          <Button variant="outline" onClick={() => router.push('/')}>
-            返回主页
+          <Button variant="outline" onClick={() => router.push('/admin')}>
+            返回管理界面
           </Button>
         </div>
         
@@ -118,13 +126,33 @@ export default function SettingPage() {
               />
             </div>
             <div className="flex justify-end">
-              <Button type="submit">保存修改</Button>
+              <Button type="submit" disabled={isChangingPassword}>
+                {isChangingPassword ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    保存中...
+                  </>
+                ) : (
+                  '保存修改'
+                )}
+              </Button>
             </div>
           </form>
         </div>
         
         <div>
-          <Button variant="destructive" onClick={logout}>
+          <Button variant="destructive" onClick={async () => {
+            try {
+              await logout()
+            } catch (error) {
+              console.error('退出登录失败:', error)
+              toast({
+                title: "退出失败",
+                description: "请稍后重试",
+                variant: "destructive"
+              })
+            }
+          }}>
             退出登录
           </Button>
         </div>

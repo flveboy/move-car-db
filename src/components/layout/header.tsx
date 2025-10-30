@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -13,6 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Car, User, Settings, LogOut, Shield } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
+import { useLoading } from './loading-provider'
 
 interface HeaderProps {
   title?: string
@@ -20,7 +23,9 @@ interface HeaderProps {
 
 export function Header({ title = '扫码挪车' }: HeaderProps) {
   const { user, logout, isAdmin } = useAuth()
-
+  const router = useRouter()
+  const { setLoading } = useLoading()
+  const pathname = usePathname()
   if (!user) {
     return (
       <header className="bg-white shadow-sm border-b">
@@ -79,20 +84,38 @@ export function Header({ title = '扫码挪车' }: HeaderProps) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profile">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>个人信息</span>
-                  </Link>
+                <DropdownMenuItem onClick={async () => {
+                  if (pathname !== '/profile') {
+                    setLoading(true)
+                    await new Promise(resolve => setTimeout(resolve, 300))
+                    await router.push('/profile')
+                  } else {
+                    router.push('/profile')
+                  }
+                }}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>个人信息</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>设置</span>
-                  </Link>
+                <DropdownMenuItem onClick={async () => {
+                  if (pathname !== '/settings') {
+                    setLoading(true)
+                    await new Promise(resolve => setTimeout(resolve, 300))
+                    await router.push('/settings')
+                  } else {
+                    router.push('/settings')
+                  }
+                }}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>设置</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
+                <DropdownMenuItem onClick={async () => {
+                  try {
+                    await logout()
+                  } catch (error) {
+                    console.error('退出登录失败:', error)
+                  }
+                }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>退出登录</span>
                 </DropdownMenuItem>

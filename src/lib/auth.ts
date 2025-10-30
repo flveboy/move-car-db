@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { Owner } from '@prisma/client'
+import type { Owner } from '@prisma/client'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 const SALT_ROUNDS = 12
@@ -32,7 +32,7 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 // 生成 JWT Token
-export function generateToken(user: Owner): string {
+export function generateToken(user: any): string {
   const payload: JWTPayload = {
     userId: user.id,
     phone: user.phone,

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { error: '系统中不存在此用户', userExists: false },
-        { status: 200 }
+        { status: 404 }
       )
     }
     

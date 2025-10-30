@@ -113,6 +113,7 @@ export default function Home() {
     records: false,
     notification: false
   })
+  const [redirecting, setRedirecting] = useState(false)
 
   
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
@@ -340,8 +341,16 @@ export default function Home() {
 
   // 检查认证状态并重定向
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/auth')
+    if (!authLoading) {
+      if (!user) {
+        router.push('/auth')
+      } else if (user.role === 'ADMIN') {
+        // 管理员自动跳转到后台管理界面
+        setRedirecting(true)
+        setTimeout(() => {
+          router.push('/admin')
+        }, 500) // 延迟500ms让用户看到加载效果
+      }
     }
   }, [user, authLoading, router])
 
@@ -2913,6 +2922,29 @@ export default function Home() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* 重定向加载遮罩 */}
+      <AnimatePresence>
+        {redirecting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-card p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4"
+            >
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-lg font-medium">正在跳转到管理界面...</p>
+              <p className="text-sm text-muted-foreground">请稍候</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

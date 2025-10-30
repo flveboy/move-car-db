@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLoading } from '@/components/layout/loading-provider'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,10 +20,12 @@ interface EditProfileDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onProfileUpdated?: () => void
+  onLoadingChange?: (loading: boolean) => void
 }
 
-export function EditProfileDialog({ open, onOpenChange, onProfileUpdated }: EditProfileDialogProps) {
+export function EditProfileDialog({ open, onOpenChange, onProfileUpdated, onLoadingChange }: EditProfileDialogProps) {
   const { user, token } = useAuth()
+  const { setLoading: setGlobalLoading } = useLoading()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -62,6 +65,7 @@ export function EditProfileDialog({ open, onOpenChange, onProfileUpdated }: Edit
     }
 
     setLoading(true)
+    onLoadingChange?.(true)
 
     try {
       const response = await fetch('/api/profile/update', {
@@ -78,7 +82,10 @@ export function EditProfileDialog({ open, onOpenChange, onProfileUpdated }: Edit
       if (response.ok) {
         toast.success('个人资料更新成功')
         onOpenChange(false)
-        onProfileUpdated?.()
+        // 添加延迟确保loading效果可见
+        setGlobalLoading(true)
+        onProfileUpdated?.() // 立即刷新页面
+        // 不手动关闭loading，由新页面的usePageLoadComplete自动处理
       } else {
         toast.error(data.error || '更新失败')
       }
@@ -87,6 +94,7 @@ export function EditProfileDialog({ open, onOpenChange, onProfileUpdated }: Edit
       toast.error('网络错误，请稍后重试')
     } finally {
       setLoading(false)
+      onLoadingChange?.(false)
     }
   }
 

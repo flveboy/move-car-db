@@ -18,9 +18,10 @@ interface AuthContextType {
   token: string | null
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
-  logout: () => void
+  logout: () => Promise<void>
   isLoading: boolean
   isAdmin: boolean
+  isLoggingOut: boolean
 }
 
 interface RegisterData {
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const router = useRouter()
 
   // 初始化认证状态
@@ -63,6 +65,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             localStorage.removeItem('auth_token')
             setToken(null)
           }
+        } else {
+          // 没有token，直接完成初始化
+          setToken(null)
         }
       } catch (error) {
         console.error('初始化认证状态失败:', error)
@@ -146,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 退出登录
   const logout = async () => {
+    setIsLoggingOut(true)
     try {
       if (token) {
         await fetch('/api/auth/logout', {
@@ -157,11 +163,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('退出登录失败:', error)
+      setIsLoggingOut(false)
+      return Promise.reject(error)
     } finally {
+      // 先清除状态，再跳转页面，确保登录状态正确重置
       setUser(null)
       setToken(null)
       localStorage.removeItem('auth_token')
-      router.push('/')
+      // 延迟一小段时间再跳转，让用户看到退出中状态
+      setTimeout(() => {
+        router.push('/auth')
+        setIsLoggingOut(false)
+      }, 300)
     }
   }
 
@@ -176,7 +189,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         isLoading,
-        isAdmin
+        isAdmin,
+        isLoggingOut
       }}
     >
       {children}

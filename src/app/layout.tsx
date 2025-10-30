@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { LoadingProvider } from "@/components/layout/loading-provider";
+import { LogoutWrapper } from "@/components/layout/logout-wrapper";
 
 export const metadata: Metadata = {
   title: "扫码挪车 - 智能停车管理系统",
@@ -33,12 +24,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
-      >
+      <body className="antialiased bg-background text-foreground">
         <AuthProvider>
-          {children}
-          <Toaster />
+          <LoadingProvider>
+            <LogoutWrapper>
+              {children}
+              <Toaster />
+            </LogoutWrapper>
+          </LoadingProvider>
         </AuthProvider>
       </body>
     </html>
